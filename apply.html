@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>応募フォーム — MOKUMOKU MATCH</title>
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="/" class="nav__logo">
+      <div class="nav__logo-mark">🌿</div>
+      <span>MOKUMOKU MATCH</span>
+    </a>
+    <div class="nav__links">
+      <a href="/jobs">求人を探す</a>
+      <a href="/listing">店舗掲載</a>
+    </div>
+    <div class="nav__cta">
+      <a href="/jobs" class="btn btn--primary">求人を見る</a>
+    </div>
+    <button class="nav__mobile-toggle" onclick="openMobileNav()" aria-label="メニュー">☰</button>
+  </nav>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav__header">
+    <div class="nav__logo"><div class="nav__logo-mark">🌿</div><span>MOKUMOKU MATCH</span></div>
+    <button class="mobile-nav__close" onclick="closeMobileNav()">✕</button>
+  </div>
+  <div class="mobile-nav__links">
+    <a href="/" onclick="closeMobileNav()">トップ</a>
+    <a href="/jobs" onclick="closeMobileNav()">求人を探す</a>
+  </div>
+</div>
+
+<main style="padding: 40px 0 80px;">
+  <div class="container container--narrow">
+    <nav class="breadcrumb">
+      <a href="/">トップ</a>
+      <span class="breadcrumb__sep">›</span>
+      <a href="/jobs">求人一覧</a>
+      <span class="breadcrumb__sep">›</span>
+      <span id="breadcrumbJob">応募フォーム</span>
+    </nav>
+
+    <!-- Job Summary Card -->
+    <div id="jobSummary" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:32px;">
+      <div style="font-size:0.75rem;color:var(--gray);margin-bottom:4px;" id="summaryStore">—</div>
+      <div style="font-size:1.1rem;font-weight:700;" id="summaryTitle">—</div>
+      <div style="font-size:0.9rem;color:var(--green-l);font-weight:600;margin-top:6px;" id="summarySalary">—</div>
+    </div>
+
+    <div style="margin-bottom:32px;">
+      <div class="section-eyebrow">APPLY</div>
+      <h1 class="section-title" style="font-size:1.8rem;">応募フォーム</h1>
+      <p style="color:var(--gray);margin-top:8px;font-size:0.9rem;">会員登録不要・完全無料。必須項目を入力して送信してください。</p>
+    </div>
+
+    <div id="errorAlert" class="alert alert--error" style="display:none;"></div>
+
+    <form id="applyForm" enctype="multipart/form-data" novalidate>
+      <input type="hidden" id="jobId" name="jobId" value="">
+
+      <!-- 基本情報 -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">基本情報</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="name">お名前<span class="required">*</span></label>
+            <input type="text" class="form-input" id="name" name="name" placeholder="山田 太郎" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="nameKana">フリガナ<span class="required">*</span></label>
+            <input type="text" class="form-input" id="nameKana" name="nameKana" placeholder="ヤマダ タロウ" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="email">メールアドレス<span class="required">*</span></label>
+            <input type="email" class="form-input" id="email" name="email" placeholder="example@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="phone">電話番号<span class="required">*</span></label>
+            <input type="tel" class="form-input" id="phone" name="phone" placeholder="090-0000-0000" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="age">年齢</label>
+            <input type="number" class="form-input" id="age" name="age" placeholder="25" min="18" max="70">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="availableDays">希望勤務日数・シフト</label>
+            <input type="text" class="form-input" id="availableDays" name="availableDays" placeholder="週3日・土日中心">
+          </div>
+        </div>
+      </div>
+
+      <!-- 経験・志望動機 -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">経験・志望動機</div>
+
+        <div class="form-group">
+          <label class="form-label" for="experience">シーシャ・飲食業の経験</label>
+          <select class="form-select" id="experience" name="experience">
+            <option value="">選択してください</option>
+            <option value="未経験">未経験</option>
+            <option value="シーシャ経験あり（1年未満）">シーシャ経験あり（1年未満）</option>
+            <option value="シーシャ経験あり（1年以上）">シーシャ経験あり（1年以上）</option>
+            <option value="飲食業経験あり（シーシャ未経験）">飲食業経験あり（シーシャ未経験）</option>
+            <option value="シーシャバー運営経験あり">シーシャバー運営経験あり</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="motivation">志望動機・自己PR<span class="required">*</span></label>
+          <textarea class="form-textarea" id="motivation" name="motivation" placeholder="このお店を選んだ理由、自己PRなどをご記入ください。" rows="5" required style="min-height:140px;"></textarea>
+          <div class="form-hint">シーシャが好きな理由、どんなスタッフになりたいかなど自由にお書きください。</div>
+        </div>
+      </div>
+
+      <!-- 履歴書アップロード -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:28px;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">履歴書（任意）</div>
+
+        <div class="file-upload" id="fileUploadArea">
+          <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleFileChange(this)">
+          <div class="file-upload__icon">📄</div>
+          <div class="file-upload__text">
+            <strong>クリックしてファイルを選択</strong>またはドラッグ＆ドロップ<br>
+            <span style="font-size:0.75rem;">PDF / Word / 画像（最大5MB）</span>
+          </div>
+        </div>
+        <div class="file-list" id="fileList"></div>
+      </div>
+
+      <!-- 同意 -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:28px;">
+        <label class="form-check">
+          <input type="checkbox" id="agree" name="agree" required>
+          <span class="form-check__label">
+            <a href="#" style="color:var(--green-l);">プライバシーポリシー</a>に同意します。入力いただいた個人情報は応募の対応にのみ使用します。<span class="required">*</span>
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--full btn--lg" id="submitBtn">
+        応募する →
+      </button>
+      <p style="text-align:center;font-size:0.8rem;color:var(--gray);margin-top:12px;">
+        送信後、ご入力いただいたメールアドレスに確認メールをお送りします。
+      </p>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer__bottom" style="border-top:1px solid var(--border);padding-top:24px;">
+      <span>© 2026 MOKUMOKU MATCH</span>
+      <a href="/jobs" style="color:var(--gray);">求人一覧へ戻る</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
+function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
+
+// Drag and drop
+const dropZone = document.getElementById('fileUploadArea');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const files = e.dataTransfer.files;
+  if (files[0]) {
+    const input = document.getElementById('resume');
+    const dt = new DataTransfer();
+    dt.items.add(files[0]);
+    input.files = dt.files;
+    renderFileItem(files[0]);
+  }
+});
+
+function handleFileChange(input) {
+  if (input.files[0]) renderFileItem(input.files[0]);
+}
+
+function renderFileItem(file) {
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  const item = document.createElement('div');
+  item.className = 'file-item';
+  item.innerHTML = `
+    <span>📄</span>
+    <span>${file.name}</span>
+    <span style="color:var(--gray);font-size:0.75rem;">${(file.size / 1024).toFixed(0)}KB</span>
+    <button type="button" class="file-item__remove" onclick="removeFile()">✕</button>
+  `;
+  list.appendChild(item);
+}
+
+function removeFile() {
+  document.getElementById('resume').value = '';
+  document.getElementById('fileList').innerHTML = '';
+}
+
+// Load job info from URL
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) return;
+
+  document.getElementById('jobId').value = id;
+
+  try {
+    const res = await fetch(`/api/jobs/${id}`);
+    if (!res.ok) return;
+    const job = await res.json();
+    document.title = `応募: ${job.title} — MOKUMOKU MATCH`;
+    document.getElementById('breadcrumbJob').textContent = job.title;
+
+    const summary = document.getElementById('jobSummary');
+    summary.style.display = 'block';
+    document.getElementById('summaryStore').textContent = `${job.store?.name || ''} · ${job.area || ''}`;
+    document.getElementById('summaryTitle').textContent = job.title;
+    document.getElementById('summarySalary').textContent = job.salary;
+  } catch(e) {}
+}
+
+// Submit
+document.getElementById('applyForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const agree = document.getElementById('agree');
+  if (!agree.checked) {
+    showError('プライバシーポリシーへの同意が必要です。');
+    return;
+  }
+
+  const formData = new FormData(e.target);
+
+  // Validate required
+  const required = ['name', 'nameKana', 'email', 'phone', 'motivation'];
+  for (const key of required) {
+    if (!formData.get(key)?.trim()) {
+      showError('必須項目をすべて入力してください。');
+      document.getElementById(key)?.focus();
+      return;
+    }
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+  hideError();
+
+  try {
+    const res = await fetch('/api/apply', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      window.location.href = '/thanks';
+    } else {
+      showError(data.error || '送信に失敗しました。もう一度お試しください。');
+      btn.disabled = false;
+      btn.textContent = '応募する →';
+    }
+  } catch(err) {
+    showError('通信エラーが発生しました。もう一度お試しください。');
+    btn.disabled = false;
+    btn.textContent = '応募する →';
+  }
+});
+
+function showError(msg) {
+  const el = document.getElementById('errorAlert');
+  el.textContent = msg;
+  el.style.display = 'flex';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function hideError() {
+  document.getElementById('errorAlert').style.display = 'none';
+}
+
+init();
+</script>
+</body>
+</html>

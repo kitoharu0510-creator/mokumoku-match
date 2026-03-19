@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面 — MOKUMOKU MATCH</title>
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body class="admin-body">
+
+<!-- Auth Check -->
+<script>
+  const TOKEN = localStorage.getItem('admin_token');
+  if (!TOKEN) window.location.href = '/admin/login';
+</script>
+
+<!-- Header -->
+<header class="admin-header">
+  <div class="admin-header__logo">
+    <span>🌿</span>
+    <span>MOKUMOKU MATCH</span>
+    <span class="admin-header__badge">ADMIN</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <span style="font-size:0.8rem;color:var(--gray);" id="adminEmail">—</span>
+    <button class="btn btn--ghost btn--sm" onclick="logout()">ログアウト</button>
+  </div>
+</header>
+
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <nav class="admin-sidebar">
+    <div class="admin-nav-item active" onclick="switchTab('dashboard')" id="nav-dashboard">
+      <span class="admin-nav-item__icon">📊</span>
+      <span>ダッシュボード</span>
+    </div>
+    <div class="admin-nav-item" onclick="switchTab('jobs')" id="nav-jobs">
+      <span class="admin-nav-item__icon">💼</span>
+      <span>求人管理</span>
+    </div>
+    <div class="admin-nav-item" onclick="switchTab('stores')" id="nav-stores">
+      <span class="admin-nav-item__icon">🏪</span>
+      <span>店舗管理</span>
+    </div>
+    <div class="admin-nav-item" onclick="switchTab('applications')" id="nav-applications">
+      <span class="admin-nav-item__icon">📝</span>
+      <span>応募一覧</span>
+      <span id="newAppsCount" style="display:none;background:var(--green);color:white;font-size:0.7rem;padding:1px 7px;border-radius:100px;margin-left:auto;font-weight:700;"></span>
+    </div>
+    <div class="admin-nav-item" onclick="switchTab('inquiries')" id="nav-inquiries">
+      <span class="admin-nav-item__icon">📬</span>
+      <span>問い合わせ</span>
+    </div>
+    <div class="admin-nav-item" onclick="switchTab('tags')" id="nav-tags">
+      <span class="admin-nav-item__icon">🏷️</span>
+      <span>タグ管理</span>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:16px 0;"></div>
+    <a href="/" class="admin-nav-item" style="text-decoration:none;">
+      <span class="admin-nav-item__icon">🌐</span>
+      <span>サイトを見る</span>
+    </a>
+  </nav>
+
+  <!-- Content -->
+  <main class="admin-content">
+
+    <!-- ============ DASHBOARD ============ -->
+    <div class="admin-tab active" id="tab-dashboard">
+      <div class="admin-page-title">ダッシュボード</div>
+      <div class="admin-stats" id="statsGrid"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="admin-table-wrap">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:0.9rem;">最新の応募</div>
+          <table class="admin-table" id="recentApps">
+            <tbody><tr><td colspan="3" class="empty-state" style="padding:24px;text-align:center;color:var(--gray);">読み込み中...</td></tr></tbody>
+          </table>
+        </div>
+        <div class="admin-table-wrap">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:0.9rem;">最新の問い合わせ</div>
+          <table class="admin-table" id="recentInquiries">
+            <tbody><tr><td colspan="3" class="empty-state" style="padding:24px;text-align:center;color:var(--gray);">読み込み中...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ JOBS ============ -->
+    <div class="admin-tab" id="tab-jobs">
+      <div class="admin-page-title">
+        <span>求人管理</span>
+        <button class="btn btn--primary btn--sm" onclick="openJobModal()">+ 新規求人</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>タイトル</th>
+              <th>店舗</th>
+              <th>エリア</th>
+              <th>雇用形態</th>
+              <th>給与</th>
+              <th>状態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="jobsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ STORES ============ -->
+    <div class="admin-tab" id="tab-stores">
+      <div class="admin-page-title">
+        <span>店舗管理</span>
+        <button class="btn btn--primary btn--sm" onclick="openStoreModal()">+ 新規店舗</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>店舗名</th>
+              <th>エリア</th>
+              <th>雰囲気</th>
+              <th>フレーバー数</th>
+              <th>状態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="storesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ APPLICATIONS ============ -->
+    <div class="admin-tab" id="tab-applications">
+      <div class="admin-page-title">応募一覧</div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>日時</th>
+              <th>氏名</th>
+              <th>求人</th>
+              <th>連絡先</th>
+              <th>ステータス</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="appsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ INQUIRIES ============ -->
+    <div class="admin-tab" id="tab-inquiries">
+      <div class="admin-page-title">問い合わせ一覧</div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>日時</th>
+              <th>店舗名</th>
+              <th>担当者</th>
+              <th>連絡先</th>
+              <th>プラン</th>
+              <th>ステータス</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="inquiriesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ TAGS ============ -->
+    <div class="admin-tab" id="tab-tags">
+      <div class="admin-page-title">
+        <span>タグ管理</span>
+        <button class="btn btn--primary btn--sm" onclick="openTagModal()">+ 新規タグ</button>
+      </div>
+      <div id="tagsContent" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ============ MODALS ============ -->
+
+<!-- Application Detail Modal -->
+<div class="modal-overlay" id="appModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal__header">
+      <div class="modal__title">応募詳細</div>
+      <button class="modal__close" onclick="closeModal('appModal')">✕</button>
+    </div>
+    <div class="modal__body" id="appModalBody"></div>
+    <div class="modal__footer">
+      <select class="form-select" id="appStatusSelect" style="width:auto;">
+        <option value="new">新着</option>
+        <option value="reviewing">選考中</option>
+        <option value="hired">採用</option>
+        <option value="rejected">不採用</option>
+      </select>
+      <button class="btn btn--primary btn--sm" onclick="updateAppStatus()">ステータス更新</button>
+      <button class="btn btn--ghost btn--sm" onclick="closeModal('appModal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Inquiry Detail Modal -->
+<div class="modal-overlay" id="inquiryModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal__header">
+      <div class="modal__title">問い合わせ詳細</div>
+      <button class="modal__close" onclick="closeModal('inquiryModal')">✕</button>
+    </div>
+    <div class="modal__body" id="inquiryModalBody"></div>
+    <div class="modal__footer">
+      <select class="form-select" id="inquiryStatusSelect" style="width:auto;">
+        <option value="new">新着</option>
+        <option value="contacted">連絡済み</option>
+        <option value="contracted">契約済み</option>
+        <option value="closed">クローズ</option>
+      </select>
+      <button class="btn btn--primary btn--sm" onclick="updateInquiryStatus()">ステータス更新</button>
+      <button class="btn btn--ghost btn--sm" onclick="closeModal('inquiryModal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Job Modal -->
+<div class="modal-overlay" id="jobModal">
+  <div class="modal">
+    <div class="modal__header">
+      <div class="modal__title" id="jobModalTitle">新規求人</div>
+      <button class="modal__close" onclick="closeModal('jobModal')">✕</button>
+    </div>
+    <div class="modal__body">
+      <form id="jobForm" novalidate>
+        <input type="hidden" id="jobFormId">
+        <div class="form-group">
+          <label class="form-label">店舗<span class="required">*</span></label>
+          <select class="form-select" id="jfStoreId">
+            <!-- populated -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">タイトル<span class="required">*</span></label>
+          <input type="text" class="form-input" id="jfTitle" placeholder="ホールスタッフ">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">雇用形態</label>
+            <select class="form-select" id="jfEmploymentType">
+              <option value="アルバイト">アルバイト</option>
+              <option value="正社員">正社員</option>
+              <option value="業務委託">業務委託</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">エリア</label>
+            <select class="form-select" id="jfArea">
+              <option>渋谷</option><option>新宿</option><option>六本木</option>
+              <option>池袋</option><option>恵比寿</option><option>銀座</option>
+              <option>新橋</option><option>横浜</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">給与表示</label>
+          <input type="text" class="form-input" id="jfSalary" placeholder="時給1,400円〜1,700円">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">最低給与（数字）</label>
+            <input type="number" class="form-input" id="jfSalaryMin">
+          </div>
+          <div class="form-group">
+            <label class="form-label">最高給与（数字）</label>
+            <input type="number" class="form-input" id="jfSalaryMax">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">勤務時間</label>
+          <input type="text" class="form-input" id="jfHours" placeholder="18:00〜翌3:00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">勤務日数</label>
+          <input type="text" class="form-input" id="jfWorkDays" placeholder="週2日〜OK">
+        </div>
+        <div class="form-group">
+          <label class="form-label">仕事内容</label>
+          <textarea class="form-textarea" id="jfDescription" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">応募条件</label>
+          <textarea class="form-textarea" id="jfRequirements" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">待遇</label>
+          <textarea class="form-textarea" id="jfBenefits" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            <input type="checkbox" id="jfFeatured" style="accent-color:var(--green);margin-right:6px;">
+            FEATUREDに設定
+          </label>
+        </div>
+      </form>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--primary" onclick="saveJob()">保存</button>
+      <button class="btn btn--ghost" onclick="closeModal('jobModal')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- Store Modal -->
+<div class="modal-overlay" id="storeModal">
+  <div class="modal">
+    <div class="modal__header">
+      <div class="modal__title" id="storeModalTitle">新規店舗</div>
+      <button class="modal__close" onclick="closeModal('storeModal')">✕</button>
+    </div>
+    <div class="modal__body">
+      <form id="storeForm">
+        <input type="hidden" id="sfId">
+        <div class="form-group">
+          <label class="form-label">店舗名<span class="required">*</span></label>
+          <input type="text" class="form-input" id="sfName">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">エリア</label>
+            <select class="form-select" id="sfArea">
+              <option>渋谷</option><option>新宿</option><option>六本木</option>
+              <option>池袋</option><option>恵比寿</option><option>銀座</option>
+              <option>新橋</option><option>横浜</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">最寄駅</label>
+            <input type="text" class="form-input" id="sfStation" placeholder="渋谷駅">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">説明</label>
+          <textarea class="form-textarea" id="sfDescription" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">住所</label>
+          <input type="text" class="form-input" id="sfAddress">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instagram</label>
+          <input type="text" class="form-input" id="sfInstagram" placeholder="@your_store">
+        </div>
+        <div class="form-group">
+          <label class="form-label">TikTok</label>
+          <input type="text" class="form-input" id="sfTiktok" placeholder="@your_store">
+        </div>
+        <div class="form-group">
+          <label class="form-label">HP（URL）</label>
+          <input type="text" class="form-input" id="sfWebsite" placeholder="https://your-store.com">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">フレーバー数</label>
+            <input type="number" class="form-input" id="sfFlavorCount">
+          </div>
+          <div class="form-group">
+            <label class="form-label">機材</label>
+            <input type="text" class="form-input" id="sfEquipment" placeholder="KM使用">
+          </div>
+        </div>
+
+        <!-- 画像設定 -->
+        <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:4px;">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">店舗画像</div>
+
+          <!-- メイン画像 -->
+          <div class="form-group">
+            <label class="form-label">メイン画像</label>
+            <input type="hidden" id="sfMainPhoto">
+            <div id="sfMainPhotoPreview" style="display:none;position:relative;margin-bottom:10px;">
+              <img id="sfMainPhotoImg" src="" alt="メイン画像" style="width:100%;height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border);">
+              <button type="button" onclick="removeMainPhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:none;color:white;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:0.9rem;">✕</button>
+            </div>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+              <input type="file" id="sfMainPhotoFile" accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="uploadMainPhoto(this)">
+              <span class="btn btn--ghost btn--sm" onclick="document.getElementById('sfMainPhotoFile').click()">📷 画像を選択</span>
+              <span style="font-size:0.75rem;color:var(--gray);">JPG / PNG（最大5MB）</span>
+            </label>
+            <div id="sfMainPhotoUploading" style="display:none;font-size:0.8rem;color:var(--gray);margin-top:6px;">アップロード中...</div>
+          </div>
+
+          <!-- サブ画像 -->
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">サブ画像（複数可）</label>
+            <div id="sfSubPhotosGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;"></div>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+              <input type="file" id="sfSubPhotoFile" accept=".jpg,.jpeg,.png,.webp" multiple style="display:none;" onchange="uploadSubPhotos(this)">
+              <span class="btn btn--ghost btn--sm" onclick="document.getElementById('sfSubPhotoFile').click()">📷 追加画像を選択</span>
+              <span style="font-size:0.75rem;color:var(--gray);">複数選択可</span>
+            </label>
+            <div id="sfSubPhotoUploading" style="display:none;font-size:0.8rem;color:var(--gray);margin-top:6px;">アップロード中...</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--primary" onclick="saveStore()">保存</button>
+      <button class="btn btn--ghost" onclick="closeModal('storeModal')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tag Modal -->
+<div class="modal-overlay" id="tagModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal__header">
+      <div class="modal__title">新規タグ</div>
+      <button class="modal__close" onclick="closeModal('tagModal')">✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-group">
+        <label class="form-label">タグ名<span class="required">*</span></label>
+        <input type="text" class="form-input" id="tagName" placeholder="チル">
+      </div>
+      <div class="form-group">
+        <label class="form-label">カテゴリ</label>
+        <select class="form-select" id="tagCategory">
+          <option value="atmosphere">雰囲気 (atmosphere)</option>
+          <option value="clientele">客層 (clientele)</option>
+          <option value="workStyle">働き方 (workStyle)</option>
+          <option value="shishaElements">シーシャ要素 (shishaElements)</option>
+          <option value="area">エリア (area)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--primary" onclick="saveTag()">保存</button>
+      <button class="btn btn--ghost" onclick="closeModal('tagModal')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = '';
+let currentAppId = null;
+let currentInquiryId = null;
+let currentJobId = null;
+let storesList = [];
+let tagsList = [];
+
+const headers = () => ({
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${TOKEN}`,
+});
+
+// ============================================
+// Auth
+// ============================================
+document.getElementById('adminEmail').textContent = localStorage.getItem('admin_email') || 'admin';
+
+function logout() {
+  localStorage.removeItem('admin_token');
+  localStorage.removeItem('admin_email');
+  window.location.href = '/admin/login';
+}
+
+// ============================================
+// Tab navigation
+// ============================================
+function switchTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById(`nav-${tab}`).classList.add('active');
+  loadTabData(tab);
+}
+
+function loadTabData(tab) {
+  if (tab === 'dashboard') loadDashboard();
+  else if (tab === 'jobs') loadJobs();
+  else if (tab === 'stores') loadStores();
+  else if (tab === 'applications') loadApplications();
+  else if (tab === 'inquiries') loadInquiries();
+  else if (tab === 'tags') loadTags();
+}
+
+// ============================================
+// Dashboard
+// ============================================
+async function loadDashboard() {
+  const [stats, apps, inquiries] = await Promise.all([
+    apiGet('/api/admin/stats'),
+    apiGet('/api/admin/applications'),
+    apiGet('/api/admin/inquiries'),
+  ]);
+
+  // Stats
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="admin-stat-card"><div class="admin-stat-card__value">${stats.totalJobs}</div><div class="admin-stat-card__label">掲載求人数</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-card__value">${stats.totalStores}</div><div class="admin-stat-card__label">掲載店舗数</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-card__value">${stats.totalApplications}</div><div class="admin-stat-card__label">累計応募数</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-card__value" style="color:var(--amber);">${stats.newApplications}</div><div class="admin-stat-card__label">未確認応募</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-card__value">${stats.totalInquiries}</div><div class="admin-stat-card__label">問い合わせ数</div></div>
+  `;
+
+  // New apps badge
+  if (stats.newApplications > 0) {
+    const badge = document.getElementById('newAppsCount');
+    badge.textContent = stats.newApplications;
+    badge.style.display = 'inline-block';
+  }
+
+  // Recent apps
+  const appsBody = document.getElementById('recentApps').querySelector('tbody');
+  if (!apps.length) {
+    appsBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:20px;">応募はまだありません</td></tr>';
+  } else {
+    appsBody.innerHTML = apps.slice(0, 5).map(a => `
+      <tr>
+        <td><strong>${a.name}</strong></td>
+        <td style="color:var(--gray);font-size:0.8rem;">${a.jobTitle || '—'}</td>
+        <td><span class="status-badge status-badge--${a.status}">${statusLabel(a.status)}</span></td>
+      </tr>`).join('');
+  }
+
+  // Recent inquiries
+  const inquiriesBody = document.getElementById('recentInquiries').querySelector('tbody');
+  if (!inquiries.length) {
+    inquiriesBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:20px;">問い合わせはまだありません</td></tr>';
+  } else {
+    inquiriesBody.innerHTML = inquiries.slice(0, 5).map(i => `
+      <tr>
+        <td><strong>${i.storeName}</strong></td>
+        <td style="color:var(--gray);font-size:0.8rem;">${i.plan || '未定'}</td>
+        <td><span class="status-badge status-badge--${i.status === 'new' ? 'new' : 'reviewing'}">${i.status === 'new' ? '新着' : '対応中'}</span></td>
+      </tr>`).join('');
+  }
+}
+
+// ============================================
+// Jobs
+// ============================================
+async function loadJobs() {
+  storesList = await apiGet('/api/admin/stores');
+  const jobs = await apiGet('/api/admin/jobs');
+  const body = document.getElementById('jobsTable');
+  body.innerHTML = jobs.map(j => `
+    <tr>
+      <td><strong>${j.title}</strong>${j.isFeatured ? ' <span class="tag tag--atmosphere" style="font-size:0.65rem;padding:2px 8px;">FEATURED</span>' : ''}</td>
+      <td>${j.store?.name || '—'}</td>
+      <td>${j.area || '—'}</td>
+      <td>${j.employmentType}</td>
+      <td style="color:var(--green-l);">${j.salary}</td>
+      <td><span class="status-badge status-badge--${j.isActive ? 'active' : 'inactive'}">${j.isActive ? '公開中' : '非公開'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn--ghost btn--sm" onclick="editJob('${j.id}')">編集</button>
+          <button class="btn btn--${j.isActive ? 'ghost' : 'primary'} btn--sm" onclick="toggleJob('${j.id}', ${j.isActive})">${j.isActive ? '非公開' : '公開'}</button>
+        </div>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:24px;">求人がありません</td></tr>';
+}
+
+function openJobModal(job = null) {
+  currentJobId = job?.id || null;
+  document.getElementById('jobModalTitle').textContent = job ? '求人編集' : '新規求人';
+  // Populate store dropdown
+  const sel = document.getElementById('jfStoreId');
+  sel.innerHTML = storesList.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+
+  if (job) {
+    document.getElementById('jfStoreId').value = job.storeId || '';
+    document.getElementById('jfTitle').value = job.title || '';
+    document.getElementById('jfEmploymentType').value = job.employmentType || 'アルバイト';
+    document.getElementById('jfArea').value = job.area || '渋谷';
+    document.getElementById('jfSalary').value = job.salary || '';
+    document.getElementById('jfSalaryMin').value = job.salaryMin || '';
+    document.getElementById('jfSalaryMax').value = job.salaryMax || '';
+    document.getElementById('jfHours').value = job.hours || '';
+    document.getElementById('jfWorkDays').value = job.workDays || '';
+    document.getElementById('jfDescription').value = job.description || '';
+    document.getElementById('jfRequirements').value = job.requirements || '';
+    document.getElementById('jfBenefits').value = job.benefits || '';
+    document.getElementById('jfFeatured').checked = job.isFeatured || false;
+  } else {
+    document.getElementById('jobForm').reset();
+  }
+  openModal('jobModal');
+}
+
+async function editJob(id) {
+  const jobs = await apiGet('/api/admin/jobs');
+  const job = jobs.find(j => j.id === id);
+  if (job) openJobModal(job);
+}
+
+async function saveJob() {
+  const storeId = document.getElementById('jfStoreId').value;
+  const store = storesList.find(s => s.id === storeId);
+  const data = {
+    storeId,
+    title: document.getElementById('jfTitle').value,
+    employmentType: document.getElementById('jfEmploymentType').value,
+    area: document.getElementById('jfArea').value,
+    prefecture: store?.prefecture || '東京都',
+    salary: document.getElementById('jfSalary').value,
+    salaryMin: Number(document.getElementById('jfSalaryMin').value) || 0,
+    salaryMax: Number(document.getElementById('jfSalaryMax').value) || 0,
+    hours: document.getElementById('jfHours').value,
+    workDays: document.getElementById('jfWorkDays').value,
+    description: document.getElementById('jfDescription').value,
+    requirements: document.getElementById('jfRequirements').value,
+    benefits: document.getElementById('jfBenefits').value,
+    isFeatured: document.getElementById('jfFeatured').checked,
+    tags: { atmosphere: [], clientele: [], workStyle: [], shishaElements: [] },
+  };
+  if (!data.title) return alert('タイトルを入力してください');
+
+  if (currentJobId) {
+    await apiPut(`/api/admin/jobs/${currentJobId}`, data);
+  } else {
+    await apiPost('/api/admin/jobs', data);
+  }
+  closeModal('jobModal');
+  loadJobs();
+}
+
+async function toggleJob(id, isActive) {
+  await apiPut(`/api/admin/jobs/${id}`, { isActive: !isActive });
+  loadJobs();
+}
+
+// ============================================
+// Stores
+// ============================================
+async function loadStores() {
+  const stores = await apiGet('/api/admin/stores');
+  const body = document.getElementById('storesTable');
+  body.innerHTML = stores.map(s => `
+    <tr>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.area || '—'}</td>
+      <td>${(s.atmosphere || []).join(', ') || '—'}</td>
+      <td>${s.shishaInfo?.flavorCount || '—'} 種</td>
+      <td><span class="status-badge status-badge--${s.isActive ? 'active' : 'inactive'}">${s.isActive ? '公開中' : '非公開'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn--ghost btn--sm" onclick="editStore('${s.id}')">編集</button>
+          <button class="btn btn--ghost btn--sm" onclick="toggleStore('${s.id}', ${s.isActive})">${s.isActive ? '非公開' : '公開'}</button>
+        </div>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px;">店舗がありません</td></tr>';
+}
+
+// 現在編集中のサブ画像URLリスト
+let sfSubPhotos = [];
+
+async function openStoreModal(store = null) {
+  document.getElementById('storeModalTitle').textContent = store ? '店舗編集' : '新規店舗';
+  sfSubPhotos = [];
+
+  if (store) {
+    document.getElementById('sfId').value = store.id;
+    document.getElementById('sfName').value = store.name || '';
+    document.getElementById('sfArea').value = store.area || '渋谷';
+    document.getElementById('sfStation').value = store.station || '';
+    document.getElementById('sfDescription').value = store.description || '';
+    document.getElementById('sfAddress').value = store.address || '';
+    document.getElementById('sfInstagram').value = store.sns?.instagram || '';
+    document.getElementById('sfTiktok').value = store.sns?.tiktok || '';
+    document.getElementById('sfWebsite').value = store.sns?.website || '';
+    document.getElementById('sfFlavorCount').value = store.shishaInfo?.flavorCount || '';
+    document.getElementById('sfEquipment').value = store.shishaInfo?.equipment || '';
+    // 画像
+    setMainPhotoPreview(store.mainPhoto || '');
+    sfSubPhotos = store.photos ? [...store.photos] : [];
+    renderSubPhotos();
+  } else {
+    document.getElementById('storeForm').reset();
+    document.getElementById('sfId').value = '';
+    setMainPhotoPreview('');
+    renderSubPhotos();
+  }
+  openModal('storeModal');
+}
+
+async function editStore(id) {
+  const stores = await apiGet('/api/admin/stores');
+  const store = stores.find(s => s.id === id);
+  if (store) openStoreModal(store);
+}
+
+async function saveStore() {
+  const id = document.getElementById('sfId').value;
+  const data = {
+    name: document.getElementById('sfName').value,
+    area: document.getElementById('sfArea').value,
+    station: document.getElementById('sfStation').value,
+    description: document.getElementById('sfDescription').value,
+    address: document.getElementById('sfAddress').value,
+    sns: {
+      instagram: document.getElementById('sfInstagram').value,
+      tiktok:    document.getElementById('sfTiktok').value,
+      website:   document.getElementById('sfWebsite').value,
+    },
+    shishaInfo: {
+      flavorCount: Number(document.getElementById('sfFlavorCount').value) || 0,
+      equipment: document.getElementById('sfEquipment').value,
+    },
+    mainPhoto: document.getElementById('sfMainPhoto').value || '',
+    photos: [...sfSubPhotos],
+    atmosphere: [],
+    clientele: [],
+    prefecture: '東京都',
+  };
+  if (!data.name) return alert('店舗名を入力してください');
+  if (id) {
+    await apiPut(`/api/admin/stores/${id}`, data);
+  } else {
+    await apiPost('/api/admin/stores', data);
+  }
+  closeModal('storeModal');
+  loadStores();
+}
+
+// ============================================
+// 画像アップロード helpers
+// ============================================
+function setMainPhotoPreview(url) {
+  document.getElementById('sfMainPhoto').value = url || '';
+  const preview = document.getElementById('sfMainPhotoPreview');
+  if (url) {
+    document.getElementById('sfMainPhotoImg').src = url;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function removeMainPhoto() {
+  setMainPhotoPreview('');
+  document.getElementById('sfMainPhotoFile').value = '';
+}
+
+async function uploadMainPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('sfMainPhotoUploading').style.display = 'block';
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+    const res = await fetch('/api/admin/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${TOKEN}` }, body: formData });
+    const data = await res.json();
+    if (data.url) setMainPhotoPreview(data.url);
+    else alert('アップロードに失敗しました');
+  } catch(e) {
+    alert('アップロードエラー: ' + e.message);
+  } finally {
+    document.getElementById('sfMainPhotoUploading').style.display = 'none';
+    input.value = '';
+  }
+}
+
+async function uploadSubPhotos(input) {
+  const files = [...input.files];
+  if (!files.length) return;
+  document.getElementById('sfSubPhotoUploading').style.display = 'block';
+  try {
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch('/api/admin/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${TOKEN}` }, body: formData });
+      const data = await res.json();
+      if (data.url) sfSubPhotos.push(data.url);
+    }
+    renderSubPhotos();
+  } catch(e) {
+    alert('アップロードエラー: ' + e.message);
+  } finally {
+    document.getElementById('sfSubPhotoUploading').style.display = 'none';
+    input.value = '';
+  }
+}
+
+function renderSubPhotos() {
+  const grid = document.getElementById('sfSubPhotosGrid');
+  grid.innerHTML = sfSubPhotos.map((url, i) => `
+    <div style="position:relative;">
+      <img src="${url}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">
+      <button type="button" onclick="removeSubPhoto(${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);border:none;color:white;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.75rem;line-height:1;">✕</button>
+    </div>`).join('');
+}
+
+function removeSubPhoto(index) {
+  sfSubPhotos.splice(index, 1);
+  renderSubPhotos();
+}
+
+async function toggleStore(id, isActive) {
+  await apiPut(`/api/admin/stores/${id}`, { isActive: !isActive });
+  loadStores();
+}
+
+// ============================================
+// Applications
+// ============================================
+async function loadApplications() {
+  const apps = await apiGet('/api/admin/applications');
+  const body = document.getElementById('appsTable');
+  body.innerHTML = apps.map(a => `
+    <tr>
+      <td style="font-size:0.8rem;color:var(--gray);">${formatDate(a.createdAt)}</td>
+      <td><strong>${a.name}</strong><br><span style="font-size:0.75rem;color:var(--gray);">${a.nameKana || ''}</span></td>
+      <td style="font-size:0.85rem;">${a.jobTitle || '—'}<br><span style="font-size:0.75rem;color:var(--gray);">${a.storeName || ''}</span></td>
+      <td style="font-size:0.8rem;">
+        <div>${a.email}</div>
+        <div style="color:var(--gray);">${a.phone}</div>
+      </td>
+      <td><span class="status-badge status-badge--${a.status}">${statusLabel(a.status)}</span></td>
+      <td><button class="btn btn--ghost btn--sm" onclick="openAppDetail('${a.id}')">詳細</button></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:32px;">応募はまだありません</td></tr>';
+}
+
+let allApps = [];
+async function openAppDetail(id) {
+  if (!allApps.length) allApps = await apiGet('/api/admin/applications');
+  const app = allApps.find(a => a.id === id);
+  if (!app) return;
+  currentAppId = id;
+  document.getElementById('appStatusSelect').value = app.status;
+  document.getElementById('appModalBody').innerHTML = `
+    <div class="info-list" style="margin-bottom:16px;">
+      <div class="info-item"><div class="info-item__label">氏名</div><div class="info-item__value">${app.name} (${app.nameKana || '—'})</div></div>
+      <div class="info-item"><div class="info-item__label">メール</div><div class="info-item__value"><a href="mailto:${app.email}" style="color:var(--green-l);">${app.email}</a></div></div>
+      <div class="info-item"><div class="info-item__label">電話</div><div class="info-item__value">${app.phone}</div></div>
+      <div class="info-item"><div class="info-item__label">年齢</div><div class="info-item__value">${app.age || '—'}</div></div>
+      <div class="info-item"><div class="info-item__label">希望シフト</div><div class="info-item__value">${app.availableDays || '—'}</div></div>
+      <div class="info-item"><div class="info-item__label">経験</div><div class="info-item__value">${app.experience || '—'}</div></div>
+      <div class="info-item"><div class="info-item__label">求人</div><div class="info-item__value">${app.jobTitle || '—'}</div></div>
+      <div class="info-item"><div class="info-item__label">応募日</div><div class="info-item__value">${formatDate(app.createdAt)}</div></div>
+      ${app.resumeFile ? `<div class="info-item"><div class="info-item__label">履歴書</div><div class="info-item__value"><a href="/uploads/${app.resumeFile}" target="_blank" style="color:var(--green-l);">📄 ダウンロード</a></div></div>` : ''}
+    </div>
+    <div class="form-group">
+      <div class="form-label">志望動機・自己PR</div>
+      <div style="background:var(--bg2);border-radius:8px;padding:14px;font-size:0.875rem;color:var(--gray);line-height:1.8;">${app.motivation || '—'}</div>
+    </div>
+  `;
+  openModal('appModal');
+}
+
+async function updateAppStatus() {
+  if (!currentAppId) return;
+  const status = document.getElementById('appStatusSelect').value;
+  await apiPut(`/api/admin/applications/${currentAppId}`, { status });
+  allApps = [];
+  closeModal('appModal');
+  loadApplications();
+  loadDashboard();
+}
+
+// ============================================
+// Inquiries
+// ============================================
+let allInquiries = [];
+async function loadInquiries() {
+  allInquiries = await apiGet('/api/admin/inquiries');
+  const body = document.getElementById('inquiriesTable');
+  body.innerHTML = allInquiries.map(i => `
+    <tr>
+      <td style="font-size:0.8rem;color:var(--gray);">${formatDate(i.createdAt)}</td>
+      <td><strong>${i.storeName}</strong></td>
+      <td>${i.contactName}</td>
+      <td style="font-size:0.8rem;">
+        <div><a href="mailto:${i.email}" style="color:var(--green-l);">${i.email}</a></div>
+        <div style="color:var(--gray);">${i.phone}</div>
+      </td>
+      <td style="font-size:0.8rem;">${planLabel(i.plan)}</td>
+      <td><span class="status-badge status-badge--${i.status === 'new' ? 'new' : 'reviewing'}">${inquiryStatusLabel(i.status)}</span></td>
+      <td><button class="btn btn--ghost btn--sm" onclick="openInquiryDetail('${i.id}')">詳細</button></td>
+    </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:32px;">問い合わせはまだありません</td></tr>';
+}
+
+function openInquiryDetail(id) {
+  const inq = allInquiries.find(i => i.id === id);
+  if (!inq) return;
+  currentInquiryId = id;
+  document.getElementById('inquiryStatusSelect').value = inq.status;
+  document.getElementById('inquiryModalBody').innerHTML = `
+    <div class="info-list" style="margin-bottom:16px;">
+      <div class="info-item"><div class="info-item__label">店舗名</div><div class="info-item__value">${inq.storeName}</div></div>
+      <div class="info-item"><div class="info-item__label">担当者</div><div class="info-item__value">${inq.contactName}</div></div>
+      <div class="info-item"><div class="info-item__label">メール</div><div class="info-item__value"><a href="mailto:${inq.email}" style="color:var(--green-l);">${inq.email}</a></div></div>
+      <div class="info-item"><div class="info-item__label">電話</div><div class="info-item__value">${inq.phone}</div></div>
+      <div class="info-item"><div class="info-item__label">希望プラン</div><div class="info-item__value">${planLabel(inq.plan)}</div></div>
+      <div class="info-item"><div class="info-item__label">採用ニーズ</div><div class="info-item__value">${inq.hiringNeeds || '—'}</div></div>
+      <div class="info-item"><div class="info-item__label">受信日</div><div class="info-item__value">${formatDate(inq.createdAt)}</div></div>
+    </div>
+    ${inq.message ? `<div class="form-group"><div class="form-label">メッセージ</div><div style="background:var(--bg2);border-radius:8px;padding:14px;font-size:0.875rem;color:var(--gray);line-height:1.8;">${inq.message}</div></div>` : ''}
+  `;
+  openModal('inquiryModal');
+}
+
+async function updateInquiryStatus() {
+  if (!currentInquiryId) return;
+  const status = document.getElementById('inquiryStatusSelect').value;
+  await apiPut(`/api/admin/inquiries/${currentInquiryId}`, { status });
+  closeModal('inquiryModal');
+  loadInquiries();
+}
+
+// ============================================
+// Tags
+// ============================================
+const TAG_CAT_LABELS = {
+  area: 'エリア',
+  atmosphere: '雰囲気',
+  clientele: '客層',
+  workStyle: '働き方',
+  shishaElements: 'シーシャ要素',
+};
+const TAG_CAT_CLASSES = {
+  area: 'tag--area',
+  atmosphere: 'tag--atmosphere',
+  clientele: 'tag--clientele',
+  workStyle: 'tag--workStyle',
+  shishaElements: 'tag--shishaElements',
+};
+
+async function loadTags() {
+  tagsList = await apiGet('/api/admin/tags');
+  const container = document.getElementById('tagsContent');
+  const byCategory = {};
+  tagsList.forEach(t => {
+    if (!byCategory[t.category]) byCategory[t.category] = [];
+    byCategory[t.category].push(t);
+  });
+
+  container.innerHTML = Object.entries(byCategory).map(([cat, tags]) => `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">
+      <div style="font-weight:700;margin-bottom:14px;font-size:0.875rem;">${TAG_CAT_LABELS[cat] || cat}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${tags.map(t => `
+          <span class="tag ${TAG_CAT_CLASSES[cat] || ''}" style="cursor:pointer;" title="クリックで削除" onclick="deleteTag('${t.id}', '${t.name}')">
+            ${t.name} <span style="opacity:0.6;margin-left:2px;">✕</span>
+          </span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function openTagModal() { openModal('tagModal'); }
+
+async function saveTag() {
+  const name = document.getElementById('tagName').value.trim();
+  const category = document.getElementById('tagCategory').value;
+  if (!name) return alert('タグ名を入力してください');
+  await apiPost('/api/admin/tags', { name, category });
+  closeModal('tagModal');
+  document.getElementById('tagName').value = '';
+  loadTags();
+}
+
+async function deleteTag(id, name) {
+  if (!confirm(`タグ「${name}」を削除しますか？`)) return;
+  await fetch(`${API_BASE}/api/admin/tags/${id}`, { method: 'DELETE', headers: headers() });
+  loadTags();
+}
+
+// ============================================
+// Helpers
+// ============================================
+function statusLabel(s) {
+  const map = { new: '新着', reviewing: '選考中', hired: '採用', rejected: '不採用' };
+  return map[s] || s;
+}
+function inquiryStatusLabel(s) {
+  const map = { new: '新着', contacted: '連絡済み', contracted: '契約済み', closed: 'クローズ' };
+  return map[s] || s;
+}
+function planLabel(p) {
+  const map = { starter: 'スターター', standard: 'スタンダード', premium: 'プレミアム', custom: 'カスタム' };
+  return map[p] || p || '未定';
+}
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// Modal helpers
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Click outside to close modal
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// API helpers
+async function apiGet(url) {
+  const res = await fetch(url, { headers: headers() });
+  if (res.status === 401) { logout(); return []; }
+  return res.json();
+}
+async function apiPost(url, data) {
+  return fetch(url, { method: 'POST', headers: headers(), body: JSON.stringify(data) }).then(r => r.json());
+}
+async function apiPut(url, data) {
+  return fetch(url, { method: 'PUT', headers: headers(), body: JSON.stringify(data) }).then(r => r.json());
+}
+
+// ============================================
+// Init
+// ============================================
+loadDashboard();
+storesList = apiGet('/api/admin/stores').then(s => { storesList = s; });
+</script>
+</body>
+</html>

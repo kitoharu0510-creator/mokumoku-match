@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOKUMOKU MATCH — シーシャバー特化求人</title>
+  <meta name="description" content="シーシャバーで働きたいあなたへ。カルチャーマッチングで理想のシーシャバーを見つけよう。会員登録不要。">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <nav class="nav container">
+    <a href="/" class="nav__logo">
+      <div class="nav__logo-mark">🌿</div>
+      <span>MOKUMOKU MATCH</span>
+    </a>
+    <div class="nav__links">
+      <a href="/jobs" class="">求人を探す</a>
+      <a href="/listing">店舗掲載</a>
+      <a href="/inquiry">お問い合わせ</a>
+    </div>
+    <div class="nav__cta">
+      <a href="/jobs" class="btn btn--primary">求人を見る</a>
+    </div>
+    <button class="nav__mobile-toggle" onclick="openMobileNav()" aria-label="メニュー">☰</button>
+  </nav>
+</header>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav__header">
+    <div class="nav__logo">
+      <div class="nav__logo-mark">🌿</div>
+      <span>MOKUMOKU MATCH</span>
+    </div>
+    <button class="mobile-nav__close" onclick="closeMobileNav()">✕</button>
+  </div>
+  <div class="mobile-nav__links">
+    <a href="/jobs" onclick="closeMobileNav()">求人を探す</a>
+    <a href="/listing" onclick="closeMobileNav()">店舗掲載</a>
+    <a href="/inquiry" onclick="closeMobileNav()">お問い合わせ</a>
+  </div>
+  <div class="mobile-nav__cta">
+    <a href="/jobs" class="btn btn--primary btn--full btn--lg">求人を見る</a>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero__eyebrow">シーシャバー特化求人 No.1</div>
+    <h1 class="hero__title">
+      自分に合ったシーシャバーで、<br>
+      <em>理想の働き方</em>を見つけよう。
+    </h1>
+    <p class="hero__desc">
+      雰囲気・客層・シーシャへのこだわり——カルチャーマッチングで、
+      あなたとお店のベストマッチを可視化。会員登録不要で今すぐ探せます。
+    </p>
+    <div class="hero__actions">
+      <a href="/jobs" class="btn btn--primary btn--lg">求人を見る →</a>
+      <a href="#how-it-works" class="btn btn--ghost btn--lg">使い方を見る</a>
+    </div>
+  </div>
+</section>
+
+<!-- Tag Cloud Section -->
+<section class="section--dark section--sm" id="tagCloud">
+  <div class="container">
+    <div class="section-header" style="text-align:center;margin-bottom:28px;">
+      <div class="section-eyebrow" style="justify-content:center;">カルチャーで探す</div>
+      <h2 class="section-title">どんなシーシャバーで働きたい？</h2>
+    </div>
+    <div id="tagCloudArea" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+      <!-- populated by JS -->
+      <div class="skeleton" style="height:32px;width:80px;border-radius:100px;"></div>
+      <div class="skeleton" style="height:32px;width:100px;border-radius:100px;"></div>
+      <div class="skeleton" style="height:32px;width:70px;border-radius:100px;"></div>
+      <div class="skeleton" style="height:32px;width:110px;border-radius:100px;"></div>
+      <div class="skeleton" style="height:32px;width:90px;border-radius:100px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Jobs -->
+<section class="section" id="featuredJobs">
+  <div class="container">
+    <div class="section-header" style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="section-eyebrow">FEATURED</div>
+        <h2 class="section-title">注目の求人</h2>
+      </div>
+      <a href="/jobs" class="btn btn--ghost">すべての求人を見る →</a>
+    </div>
+    <div class="jobs-grid" id="featuredJobsGrid">
+      <!-- skeleton -->
+      <div class="loading-card">
+        <div class="loading-card__image skeleton"></div>
+        <div class="loading-card__body">
+          <div class="loading-card__line skeleton"></div>
+          <div class="loading-card__line skeleton loading-card__line--short"></div>
+        </div>
+      </div>
+      <div class="loading-card">
+        <div class="loading-card__image skeleton"></div>
+        <div class="loading-card__body">
+          <div class="loading-card__line skeleton"></div>
+          <div class="loading-card__line skeleton loading-card__line--short"></div>
+        </div>
+      </div>
+      <div class="loading-card">
+        <div class="loading-card__image skeleton"></div>
+        <div class="loading-card__body">
+          <div class="loading-card__line skeleton"></div>
+          <div class="loading-card__line skeleton loading-card__line--short"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section section--dark" id="how-it-works">
+  <div class="container">
+    <div class="section-header" style="text-align:center;margin-bottom:48px;">
+      <div class="section-eyebrow" style="justify-content:center;">WHY MOKUMOKU MATCH</div>
+      <h2 class="section-title">シーシャバー専門だから<br>できること</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-card__icon">🎯</div>
+        <div class="feature-card__title">カルチャーマッチング</div>
+        <div class="feature-card__desc">雰囲気・客層・シーシャへのこだわりをタグで選ぶだけで、マッチ度スコアを表示。自分に合ったお店を一目で判断できます。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon">⚡</div>
+        <div class="feature-card__title">会員登録不要</div>
+        <div class="feature-card__desc">アカウント作成なしで今すぐ応募できます。フォームに入力するだけでOK。履歴書のPDF添付にも対応。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon">🌿</div>
+        <div class="feature-card__title">シーシャ情報が充実</div>
+        <div class="feature-card__desc">フレーバー数・機材・ノンニコチン対応など、シーシャバーならではの詳細情報を掲載。働く前に全部わかります。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon">🔍</div>
+        <div class="feature-card__title">こだわり検索</div>
+        <div class="feature-card__desc">エリア・雇用形態・雰囲気・働き方条件など多彩なフィルターで、理想の求人をピンポイントで見つけられます。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How to Use -->
+<section class="section">
+  <div class="container" style="max-width:760px;">
+    <div class="section-header" style="text-align:center;margin-bottom:48px;">
+      <div class="section-eyebrow" style="justify-content:center;">HOW TO USE</div>
+      <h2 class="section-title">3ステップで応募完了</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step__num">1</div>
+        <div class="step__content">
+          <div class="step__title">タグ・エリアで絞り込む</div>
+          <div class="step__desc">働きたいエリアや、好きなシーシャバーの雰囲気をタグで選択。マッチ度が自動計算されます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__num">2</div>
+        <div class="step__content">
+          <div class="step__title">求人詳細をチェック</div>
+          <div class="step__desc">シーシャ情報・雰囲気・写真ギャラリーなど、働くイメージをしっかり確認できます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__num">3</div>
+        <div class="step__content">
+          <div class="step__title">フォームで応募（会員登録不要）</div>
+          <div class="step__desc">名前・連絡先・志望動機を入力して送信。履歴書PDFも添付できます。</div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:48px;">
+      <a href="/jobs" class="btn btn--primary btn--lg">求人を探してみる →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Area Quick Links -->
+<section class="section section--darker">
+  <div class="container">
+    <div class="section-header" style="text-align:center;margin-bottom:32px;">
+      <div class="section-eyebrow" style="justify-content:center;">AREA</div>
+      <h2 class="section-title">エリアから探す</h2>
+    </div>
+    <div id="areaLinks" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section">
+  <div class="container" style="max-width:720px;">
+    <div class="section-header" style="text-align:center;margin-bottom:40px;">
+      <div class="section-eyebrow" style="justify-content:center;">FAQ</div>
+      <h2 class="section-title">よくある質問</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>シーシャ未経験でも応募できますか？</span>
+          <span class="faq-chevron">▾</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer__inner">
+            もちろんです！「未経験歓迎」タグが付いている求人はシーシャ経験ゼロでも応募歓迎。研修制度が充実したお店も多く、シーシャ好きな方であればスキルは入社後に身につけられます。
+          </div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>会員登録は本当に不要ですか？</span>
+          <span class="faq-chevron">▾</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer__inner">
+            はい、完全に不要です。気になる求人の「応募する」ボタンから直接フォームに進み、名前・連絡先などを入力して送信するだけで応募が完了します。
+          </div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>マッチ度スコアはどう計算されますか？</span>
+          <span class="faq-chevron">▾</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer__inner">
+            求人一覧の検索条件（エリア・雰囲気・客層・働き方など）と求人のタグが一致する割合を重み付きスコアで算出しています。条件を選んでいない項目は不利に働かず、選んだ条件にどれだけマッチするかを見ます。
+          </div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>履歴書は必要ですか？</span>
+          <span class="faq-chevron">▾</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer__inner">
+            任意です。PDF・Word形式で添付できますが、なくても応募できます。まずは気軽に応募してみてください。
+          </div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>店舗としての掲載はどうすればいいですか？</span>
+          <span class="faq-chevron">▾</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer__inner">
+            <a href="/listing" style="color:var(--green-l);">店舗掲載ページ</a>からプランをご確認のうえ、お問い合わせください。シーシャバーに特化した求人プラットフォームで、質の高い求職者にリーチできます。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Banner -->
+<section class="section section--dark">
+  <div class="container" style="text-align:center;max-width:640px;">
+    <div class="section-eyebrow" style="justify-content:center;">GET STARTED</div>
+    <h2 class="section-title" style="margin-bottom:16px;">今すぐシーシャバー求人を探そう</h2>
+    <p style="color:var(--gray);margin-bottom:32px;line-height:1.8;">会員登録不要・完全無料。あなたのカルチャーにマッチしたシーシャバーで、理想の働き方を実現しよう。</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="/jobs" class="btn btn--primary btn--lg">求人を見る →</a>
+      <a href="/listing" class="btn btn--ghost btn--lg">店舗掲載の相談</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <div class="nav__logo-mark">🌿</div>
+          <span>MOKUMOKU MATCH</span>
+        </div>
+        <p class="footer__desc">シーシャバー特化のカルチャーマッチング求人プラットフォーム。雰囲気・客層・こだわりで理想のお店を見つけよう。</p>
+      </div>
+      <div>
+        <div class="footer__col-title">求職者</div>
+        <div class="footer__links">
+          <a href="/jobs">求人一覧</a>
+          <a href="/jobs?area=渋谷">渋谷の求人</a>
+          <a href="/jobs?area=新宿">新宿の求人</a>
+          <a href="/jobs?area=六本木">六本木の求人</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer__col-title">店舗様</div>
+        <div class="footer__links">
+          <a href="/listing">掲載のご案内</a>
+          <a href="/inquiry">掲載お問い合わせ</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer__col-title">その他</div>
+        <div class="footer__links">
+          <a href="#">利用規約</a>
+          <a href="#">プライバシーポリシー</a>
+          <a href="/admin/login">管理者ログイン</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 MOKUMOKU MATCH. All rights reserved.</span>
+      <span>シーシャバー特化求人プラットフォーム</span>
+    </div>
+  </div>
+</footer>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="トップへ戻る">↑</button>
+
+<script>
+// Mobile Nav
+function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
+function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
+
+// Scroll top
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('scrollTop');
+  btn.classList.toggle('visible', window.scrollY > 400);
+});
+
+// FAQ
+function toggleFaq(el) {
+  const item = el.closest('.faq-item');
+  const answer = item.querySelector('.faq-answer');
+  const isOpen = item.classList.contains('open');
+  // close all
+  document.querySelectorAll('.faq-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.faq-answer').style.maxHeight = null;
+  });
+  if (!isOpen) {
+    item.classList.add('open');
+    answer.style.maxHeight = answer.scrollHeight + 'px';
+  }
+}
+
+// Load stats & featured jobs
+async function init() {
+  try {
+    const [tagsRes, jobsRes] = await Promise.all([
+      fetch('/api/tags'),
+      fetch('/api/jobs?featured=true&limit=6'),
+    ]);
+    const tags = await tagsRes.json();
+    const jobs = await jobsRes.json();
+
+    renderTagCloud(tags);
+    renderFeaturedJobs(jobs.items || []);
+    renderAreaLinks(tags.area || []);
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+function renderTagCloud(tags) {
+  const area = document.getElementById('tagCloudArea');
+  area.innerHTML = '';
+  const allTags = [
+    ...(tags.atmosphere || []).map(t => ({...t, cls: 'tag--atmosphere'})),
+    ...(tags.clientele  || []).map(t => ({...t, cls: 'tag--clientele'})),
+    ...(tags.workStyle  || []).map(t => ({...t, cls: 'tag--workStyle'})),
+    ...(tags.shishaElements || []).map(t => ({...t, cls: 'tag--shishaElements'})),
+  ];
+  allTags.forEach(t => {
+    const a = document.createElement('a');
+    a.href = `/jobs?${t.category}=${encodeURIComponent(t.name)}`;
+    a.className = `tag ${t.cls}`;
+    a.style.fontSize = '0.875rem';
+    a.style.padding = '7px 16px';
+    a.textContent = t.name;
+    area.appendChild(a);
+  });
+}
+
+function renderAreaLinks(areas) {
+  const el = document.getElementById('areaLinks');
+  el.innerHTML = '';
+  areas.forEach(a => {
+    const link = document.createElement('a');
+    link.href = `/jobs?area=${encodeURIComponent(a.name)}`;
+    link.className = 'btn btn--ghost';
+    link.style.fontSize = '0.95rem';
+    link.textContent = `📍 ${a.name}`;
+    el.appendChild(link);
+  });
+}
+
+function renderFeaturedJobs(jobs) {
+  const grid = document.getElementById('featuredJobsGrid');
+  grid.innerHTML = '';
+  if (!jobs.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-state__icon">🌿</div><div class="empty-state__title">注目求人はまだありません</div></div>';
+    return;
+  }
+  jobs.forEach(job => {
+    grid.appendChild(createJobCard(job));
+  });
+}
+
+function createJobCard(job) {
+  const div = document.createElement('a');
+  div.href = `/job?id=${job.id}`;
+  div.className = `job-card${job.isFeatured ? ' job-card--featured' : ''}`;
+
+  const allJobTags = [
+    ...(job.tags?.atmosphere || []).map(n => ({name: n, cls: 'tag--atmosphere'})),
+    ...(job.tags?.workStyle  || []).map(n => ({name: n, cls: 'tag--workStyle'})),
+    ...(job.tags?.shishaElements || []).map(n => ({name: n, cls: 'tag--shishaElements'})),
+  ].slice(0, 3);
+
+  const tagsHtml = allJobTags.map(t => `<span class="tag ${t.cls}">${t.name}</span>`).join('');
+
+  const mainPhoto = job.store?.mainPhoto;
+  div.innerHTML = `
+    ${mainPhoto
+      ? `<img class="job-card__image" src="${mainPhoto}" alt="${job.store?.name || ''}" loading="lazy">`
+      : `<div class="job-card__image-placeholder">🌿</div>`
+    }
+    <div class="job-card__body">
+      <div>
+        <div class="job-card__store">${job.store?.name || ''} · ${job.area || ''}</div>
+        <div class="job-card__header">
+          <div class="job-card__title">${job.title}</div>
+          <div class="job-card__salary">${job.salary.replace(/^時給|^月給/, '').split('〜')[0].trim()}</div>
+        </div>
+      </div>
+      <div class="job-card__meta">
+        <span>📋 ${job.employmentType}</span>
+        <span>📅 ${job.workDays}</span>
+      </div>
+      <div class="job-card__tags tag-group">${tagsHtml}</div>
+      <div class="job-card__footer">
+        <span class="tag tag--employment">${job.employmentType}</span>
+        <span class="btn btn--primary btn--sm">詳細を見る</span>
+      </div>
+    </div>
+  `;
+  return div;
+}
+
+init();
+</script>
+</body>
+</html>

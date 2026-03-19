@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>求人一覧 — MOKUMOKU MATCH</title>
+  <meta name="description" content="シーシャバーの求人一覧。エリア・雰囲気・働き方でフィルターしてカルチャーマッチ度を確認。">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="/" class="nav__logo">
+      <div class="nav__logo-mark">🌿</div>
+      <span>MOKUMOKU MATCH</span>
+    </a>
+    <div class="nav__links">
+      <a href="/jobs" class="active">求人を探す</a>
+      <a href="/listing">店舗掲載</a>
+      <a href="/inquiry">お問い合わせ</a>
+    </div>
+    <div class="nav__cta">
+      <a href="/jobs" class="btn btn--primary">求人を見る</a>
+    </div>
+    <button class="nav__mobile-toggle" onclick="openMobileNav()" aria-label="メニュー">☰</button>
+  </nav>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav__header">
+    <div class="nav__logo"><div class="nav__logo-mark">🌿</div><span>MOKUMOKU MATCH</span></div>
+    <button class="mobile-nav__close" onclick="closeMobileNav()">✕</button>
+  </div>
+  <div class="mobile-nav__links">
+    <a href="/" onclick="closeMobileNav()">トップ</a>
+    <a href="/jobs" onclick="closeMobileNav()">求人を探す</a>
+    <a href="/listing" onclick="closeMobileNav()">店舗掲載</a>
+    <a href="/inquiry" onclick="closeMobileNav()">お問い合わせ</a>
+  </div>
+</div>
+
+<main style="padding: 32px 0 80px;">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="/">トップ</a>
+      <span class="breadcrumb__sep">›</span>
+      <span>求人一覧</span>
+    </nav>
+
+    <!-- Mobile filter toggle -->
+    <div class="mobile-filter-toggle">
+      <button class="btn btn--ghost btn--full" onclick="toggleMobileFilter()">
+        🔍 絞り込みフィルター
+      </button>
+    </div>
+
+    <div class="page-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__panel mobile-visible" id="filterPanel">
+          <div class="sidebar__title">絞り込み</div>
+
+          <!-- Match guide -->
+          <div style="background:var(--bg2);border-radius:8px;padding:14px;margin-bottom:20px;font-size:0.8rem;">
+            <div style="font-weight:600;margin-bottom:8px;color:var(--white);">🎯 カルチャーマッチ</div>
+            <div style="color:var(--gray);line-height:1.7;">条件を選ぶほど、各求人のマッチ度が変わります。自分に合った求人を見つけましょう。</div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group__label">📍 エリア</div>
+            <select class="filter-select" id="filterArea" onchange="applyFilters()">
+              <option value="">すべてのエリア</option>
+              <option value="渋谷">渋谷</option>
+              <option value="新宿">新宿</option>
+              <option value="六本木">六本木</option>
+              <option value="池袋">池袋</option>
+              <option value="恵比寿">恵比寿</option>
+              <option value="銀座">銀座</option>
+              <option value="新橋">新橋</option>
+              <option value="横浜">横浜</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group__label">📋 雇用形態</div>
+            <select class="filter-select" id="filterEmployment" onchange="applyFilters()">
+              <option value="">すべて</option>
+              <option value="アルバイト">アルバイト</option>
+              <option value="正社員">正社員</option>
+              <option value="業務委託">業務委託</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group__label">✨ 雰囲気（マッチに影響）</div>
+            <div class="filter-tags" id="filterAtmosphere">
+              <!-- populated by JS -->
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group__label">👥 客層（マッチに影響）</div>
+            <div class="filter-tags" id="filterClientele">
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group__label">💼 働き方（マッチに影響）</div>
+            <div class="filter-tags" id="filterWorkStyle">
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group__label">🌿 シーシャ要素（マッチに影響）</div>
+            <div class="filter-tags" id="filterShisha">
+            </div>
+          </div>
+
+          <button class="btn btn--ghost btn--full btn--sm" onclick="resetFilters()" style="margin-top:8px;">
+            ✕ フィルターをリセット
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <div>
+        <!-- Result bar -->
+        <div class="result-bar">
+          <div class="result-bar__count">
+            <strong id="resultCount">-</strong> 件の求人
+          </div>
+          <div class="result-bar__sort">
+            <span>並び替え:</span>
+            <select class="filter-select" id="sortOrder" onchange="applyFilters()" style="width:auto;padding:6px 32px 6px 10px;">
+              <option value="match">マッチ度順</option>
+              <option value="newest">新着順</option>
+              <option value="salary">給与順</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Active filter chips -->
+        <div id="activeFilters" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;"></div>
+
+        <!-- Jobs Grid -->
+        <div class="jobs-grid" id="jobsGrid">
+          <!-- populated by JS -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer__bottom" style="border-top:1px solid var(--border);padding-top:24px;">
+      <span>© 2026 MOKUMOKU MATCH</span>
+      <a href="/" style="color:var(--gray);">トップへ戻る</a>
+    </div>
+  </div>
+</footer>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="トップへ">↑</button>
+
+<script>
+// Mobile Nav
+function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
+function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
+
+// Scroll top
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 400);
+});
+
+// Mobile filter
+function toggleMobileFilter() {
+  const panel = document.getElementById('filterPanel');
+  panel.classList.toggle('mobile-visible');
+}
+
+// ============================================
+// State
+// ============================================
+let allJobs = [];
+let tags = {};
+let filters = { area: '', employmentType: '', atmosphere: '', clientele: '', workStyle: '', shishaElements: '' };
+let currentPage = 1;
+const PER_PAGE = 12;
+
+// ============================================
+// Init: load URL params
+// ============================================
+function initFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  for (const key of Object.keys(filters)) {
+    if (params.has(key)) filters[key] = params.get(key);
+  }
+  // reflect in selects
+  if (filters.area) document.getElementById('filterArea').value = filters.area;
+  if (filters.employmentType) document.getElementById('filterEmployment').value = filters.employmentType;
+}
+
+// ============================================
+// Load data
+// ============================================
+async function init() {
+  initFromUrl();
+  const [tagsRes, jobsRes] = await Promise.all([
+    fetch('/api/tags'),
+    fetch('/api/jobs?limit=100'),
+  ]);
+  tags = await tagsRes.json();
+  const jobsData = await jobsRes.json();
+  allJobs = jobsData.items || [];
+
+  renderTagFilters();
+  applyFilters();
+}
+
+function renderTagFilters() {
+  const cats = [
+    { key: 'atmosphere',    el: 'filterAtmosphere', filterKey: 'atmosphere' },
+    { key: 'clientele',     el: 'filterClientele',  filterKey: 'clientele' },
+    { key: 'workStyle',     el: 'filterWorkStyle',  filterKey: 'workStyle' },
+    { key: 'shishaElements',el: 'filterShisha',     filterKey: 'shishaElements' },
+  ];
+  cats.forEach(({ key, el, filterKey }) => {
+    const container = document.getElementById(el);
+    container.innerHTML = '';
+    (tags[key] || []).forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = `filter-tag${filters[filterKey] === t.name ? ' active' : ''}`;
+      btn.textContent = t.name;
+      btn.dataset.value = t.name;
+      btn.dataset.key = filterKey;
+      btn.onclick = () => toggleTagFilter(btn, filterKey, t.name);
+      container.appendChild(btn);
+    });
+  });
+}
+
+function toggleTagFilter(btn, key, value) {
+  if (filters[key] === value) {
+    filters[key] = '';
+    btn.classList.remove('active');
+  } else {
+    // deactivate previous
+    document.querySelectorAll(`[data-key="${key}"]`).forEach(b => b.classList.remove('active'));
+    filters[key] = value;
+    btn.classList.add('active');
+  }
+  currentPage = 1;
+  applyFilters();
+}
+
+function applyFilters() {
+  filters.area = document.getElementById('filterArea').value;
+  filters.employmentType = document.getElementById('filterEmployment').value;
+
+  let jobs = allJobs.filter(j => {
+    if (filters.area && j.area !== filters.area) return false;
+    if (filters.employmentType && j.employmentType !== filters.employmentType) return false;
+    return true;
+  });
+
+  // Compute match scores
+  jobs = jobs.map(j => ({ ...j, matchScore: computeMatchScore(j) }));
+
+  // Sort
+  const sort = document.getElementById('sortOrder').value;
+  if (sort === 'match') {
+    jobs.sort((a, b) => b.matchScore - a.matchScore);
+  } else if (sort === 'newest') {
+    jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  } else if (sort === 'salary') {
+    jobs.sort((a, b) => (b.salaryMax || 0) - (a.salaryMax || 0));
+  }
+
+  document.getElementById('resultCount').textContent = jobs.length;
+  renderActiveFilters();
+
+  // Paginate
+  const start = (currentPage - 1) * PER_PAGE;
+  const pageJobs = jobs.slice(start, start + PER_PAGE);
+  renderJobs(pageJobs);
+  renderPagination(jobs.length);
+}
+
+// ============================================
+// Match Score
+// ============================================
+function hasActiveTagFilters() {
+  return ['atmosphere', 'clientele', 'workStyle', 'shishaElements'].some(k => filters[k]);
+}
+
+function computeMatchScore(job) {
+  const weights = { atmosphere: 25, clientele: 10, workStyle: 15, shishaElements: 15 };
+  const activeFilters = ['atmosphere', 'clientele', 'workStyle', 'shishaElements'].filter(k => filters[k]);
+
+  let totalWeight = 0;
+  let earnedWeight = 0;
+
+  activeFilters.forEach(key => {
+    totalWeight += weights[key];
+    const jobTags = job.tags?.[key] || [];
+    if (jobTags.includes(filters[key])) earnedWeight += weights[key];
+  });
+
+  return totalWeight > 0 ? Math.round((earnedWeight / totalWeight) * 100) : 0;
+}
+
+function matchBadgeClass(score) {
+  if (score >= 80) return 'match-badge--high';
+  if (score >= 60) return 'match-badge--mid';
+  return 'match-badge--low';
+}
+
+// ============================================
+// Render
+// ============================================
+function renderJobs(jobs) {
+  const grid = document.getElementById('jobsGrid');
+  grid.innerHTML = '';
+
+  if (!jobs.length) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <div class="empty-state__icon">🌿</div>
+        <div class="empty-state__title">条件に合う求人が見つかりません</div>
+        <div class="empty-state__desc">フィルターを変えてもう一度お試しください</div>
+        <button class="btn btn--ghost" onclick="resetFilters()">フィルターをリセット</button>
+      </div>`;
+    return;
+  }
+
+  jobs.forEach(job => {
+    const card = document.createElement('a');
+    card.href = `/job?id=${job.id}`;
+    card.className = `job-card${job.isFeatured ? ' job-card--featured' : ''}`;
+
+    const jobTags = [
+      ...(job.tags?.atmosphere || []).map(n => ({name:n, cls:'tag--atmosphere'})),
+      ...(job.tags?.clientele  || []).map(n => ({name:n, cls:'tag--clientele'})),
+      ...(job.tags?.workStyle  || []).map(n => ({name:n, cls:'tag--workStyle'})),
+      ...(job.tags?.shishaElements || []).map(n => ({name:n, cls:'tag--shishaElements'})),
+    ].slice(0, 4);
+
+    const mainPhoto = job.store?.mainPhoto;
+    card.innerHTML = `
+      ${mainPhoto
+        ? `<img class="job-card__image" src="${mainPhoto}" alt="${job.store?.name || ''}" loading="lazy">`
+        : `<div class="job-card__image-placeholder">🌿</div>`
+      }
+      <div class="job-card__body">
+        <div>
+          <div class="job-card__store">${job.store?.name || ''} · ${job.area || ''}</div>
+          <div class="job-card__header">
+            <div class="job-card__title">${job.title}</div>
+          </div>
+        </div>
+        <div class="job-card__salary">${job.salary}</div>
+        <div class="job-card__meta">
+          <span>📋 ${job.employmentType}</span>
+          <span>📅 ${job.workDays}</span>
+        </div>
+        <div class="job-card__tags tag-group">
+          ${jobTags.map(t => `<span class="tag ${t.cls}">${t.name}</span>`).join('')}
+        </div>
+        <div class="job-card__footer">
+          ${hasActiveTagFilters()
+            ? `<span class="match-badge ${matchBadgeClass(job.matchScore)}"><span class="match-dot"></span>マッチ度 ${job.matchScore}%</span>`
+            : `<span style="font-size:0.75rem;color:var(--gray);">条件を選ぶとマッチ度が表示されます</span>`
+          }
+          <span class="btn btn--primary btn--sm">詳細を見る</span>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderPagination(total) {
+  const totalPages = Math.ceil(total / PER_PAGE);
+  const el = document.getElementById('pagination');
+  el.innerHTML = '';
+  if (totalPages <= 1) return;
+
+  if (currentPage > 1) {
+    const prev = document.createElement('button');
+    prev.className = 'pagination__btn';
+    prev.textContent = '‹';
+    prev.onclick = () => { currentPage--; applyFilters(); window.scrollTo({top:0,behavior:'smooth'}); };
+    el.appendChild(prev);
+  }
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.className = `pagination__btn${i === currentPage ? ' active' : ''}`;
+    btn.textContent = i;
+    btn.onclick = () => { currentPage = i; applyFilters(); window.scrollTo({top:0,behavior:'smooth'}); };
+    el.appendChild(btn);
+  }
+
+  if (currentPage < totalPages) {
+    const next = document.createElement('button');
+    next.className = 'pagination__btn';
+    next.textContent = '›';
+    next.onclick = () => { currentPage++; applyFilters(); window.scrollTo({top:0,behavior:'smooth'}); };
+    el.appendChild(next);
+  }
+}
+
+function renderActiveFilters() {
+  const el = document.getElementById('activeFilters');
+  el.innerHTML = '';
+  const labels = { area: 'エリア', employmentType: '雇用形態', atmosphere: '雰囲気', clientele: '客層', workStyle: '働き方', shishaElements: 'シーシャ' };
+  Object.entries(filters).forEach(([key, val]) => {
+    if (!val) return;
+    const chip = document.createElement('span');
+    chip.className = 'tag tag--area';
+    chip.style.cursor = 'pointer';
+    chip.innerHTML = `${labels[key]}: ${val} <span style="margin-left:4px;opacity:0.7;">✕</span>`;
+    chip.onclick = () => {
+      filters[key] = '';
+      if (key === 'area') document.getElementById('filterArea').value = '';
+      if (key === 'employmentType') document.getElementById('filterEmployment').value = '';
+      document.querySelectorAll(`[data-key="${key}"]`).forEach(b => b.classList.remove('active'));
+      currentPage = 1;
+      applyFilters();
+    };
+    el.appendChild(chip);
+  });
+}
+
+function resetFilters() {
+  filters = { area: '', employmentType: '', atmosphere: '', clientele: '', workStyle: '', shishaElements: '' };
+  document.getElementById('filterArea').value = '';
+  document.getElementById('filterEmployment').value = '';
+  document.querySelectorAll('.filter-tag.active').forEach(b => b.classList.remove('active'));
+  currentPage = 1;
+  applyFilters();
+}
+
+init();
+</script>
+</body>
+</html>

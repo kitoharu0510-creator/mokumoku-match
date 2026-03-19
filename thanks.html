@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>応募完了 — MOKUMOKU MATCH</title>
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="/" class="nav__logo">
+      <div class="nav__logo-mark">🌿</div>
+      <span>MOKUMOKU MATCH</span>
+    </a>
+    <div class="nav__links">
+      <a href="/jobs">求人を探す</a>
+      <a href="/listing">店舗掲載</a>
+    </div>
+    <div class="nav__cta">
+      <a href="/jobs" class="btn btn--primary">他の求人を見る</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="thanks-hero container">
+    <div class="thanks-icon">✅</div>
+    <h1 class="thanks-title">応募が完了しました</h1>
+    <p class="thanks-desc">
+      ご応募ありがとうございます。<br>
+      内容を確認のうえ、担当者からご連絡いたします。<br>
+      数日以内にご連絡が届かない場合は、メールの迷惑フォルダをご確認ください。
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="/jobs" class="btn btn--primary btn--lg">他の求人を探す →</a>
+      <a href="/" class="btn btn--ghost btn--lg">トップへ戻る</a>
+    </div>
+  </div>
+
+  <!-- Other jobs section -->
+  <section class="section section--dark">
+    <div class="container">
+      <div class="section-header" style="text-align:center;margin-bottom:32px;">
+        <div class="section-eyebrow" style="justify-content:center;">OTHER JOBS</div>
+        <h2 class="section-title">他の求人も見てみよう</h2>
+      </div>
+      <div class="jobs-grid" id="otherJobs"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer__bottom" style="border-top:1px solid var(--border);padding-top:24px;">
+      <span>© 2026 MOKUMOKU MATCH</span>
+      <a href="/" style="color:var(--gray);">トップへ戻る</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+async function loadOtherJobs() {
+  try {
+    const res = await fetch('/api/jobs?limit=3&featured=true');
+    const data = await res.json();
+    const grid = document.getElementById('otherJobs');
+    grid.innerHTML = '';
+    (data.items || []).forEach(job => {
+      const card = document.createElement('a');
+      card.href = `/job?id=${job.id}`;
+      card.className = `job-card${job.isFeatured ? ' job-card--featured' : ''}`;
+      card.innerHTML = `
+        <div class="job-card__image-placeholder">🌿</div>
+        <div class="job-card__body">
+          <div class="job-card__store">${job.store?.name || ''} · ${job.area || ''}</div>
+          <div class="job-card__title" style="margin-bottom:8px;">${job.title}</div>
+          <div class="job-card__salary">${job.salary}</div>
+          <div class="job-card__footer" style="margin-top:auto;padding-top:12px;border-top:1px solid var(--border);">
+            <span class="tag tag--employment">${job.employmentType}</span>
+            <span class="btn btn--primary btn--sm">詳細を見る</span>
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  } catch(e) {}
+}
+loadOtherJobs();
+</script>
+</body>
+</html>

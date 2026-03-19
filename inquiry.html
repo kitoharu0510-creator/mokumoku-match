@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>掲載お問い合わせ — MOKUMOKU MATCH</title>
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="/" class="nav__logo">
+      <div class="nav__logo-mark">🌿</div>
+      <span>MOKUMOKU MATCH</span>
+    </a>
+    <div class="nav__links">
+      <a href="/jobs">求人を探す</a>
+      <a href="/listing">店舗掲載</a>
+      <a href="/inquiry" class="active">お問い合わせ</a>
+    </div>
+    <div class="nav__cta">
+      <a href="/jobs" class="btn btn--primary">求人を見る</a>
+    </div>
+    <button class="nav__mobile-toggle" onclick="openMobileNav()" aria-label="メニュー">☰</button>
+  </nav>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav__header">
+    <div class="nav__logo"><div class="nav__logo-mark">🌿</div><span>MOKUMOKU MATCH</span></div>
+    <button class="mobile-nav__close" onclick="closeMobileNav()">✕</button>
+  </div>
+  <div class="mobile-nav__links">
+    <a href="/" onclick="closeMobileNav()">トップ</a>
+    <a href="/jobs" onclick="closeMobileNav()">求人を探す</a>
+    <a href="/listing" onclick="closeMobileNav()">店舗掲載</a>
+  </div>
+</div>
+
+<main style="padding: 40px 0 80px;">
+  <div class="container container--narrow">
+    <nav class="breadcrumb">
+      <a href="/">トップ</a>
+      <span class="breadcrumb__sep">›</span>
+      <a href="/listing">店舗掲載</a>
+      <span class="breadcrumb__sep">›</span>
+      <span>お問い合わせ</span>
+    </nav>
+
+    <div style="margin-bottom:32px;">
+      <div class="section-eyebrow">INQUIRY</div>
+      <h1 class="section-title" style="font-size:1.8rem;">掲載お問い合わせ</h1>
+      <p style="color:var(--gray);margin-top:8px;line-height:1.8;">掲載のご相談・お見積もりはこちらのフォームからお問い合わせください。通常1〜2営業日以内にご連絡いたします。</p>
+    </div>
+
+    <!-- Success message -->
+    <div id="successMsg" class="alert alert--success" style="display:none;">
+      ✅ お問い合わせを受け付けました。担当者より1〜2営業日以内にご連絡いたします。
+    </div>
+
+    <div id="errorAlert" class="alert alert--error" style="display:none;"></div>
+
+    <form id="inquiryForm" style="display:block;" novalidate>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">店舗情報</div>
+
+        <div class="form-group">
+          <label class="form-label" for="storeName">店舗名<span class="required">*</span></label>
+          <input type="text" class="form-input" id="storeName" name="storeName" placeholder="CLOUD LOUNGE" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="storeArea">エリア</label>
+            <select class="form-select" id="storeArea" name="storeArea">
+              <option value="">選択してください</option>
+              <option>渋谷</option>
+              <option>新宿</option>
+              <option>六本木</option>
+              <option>池袋</option>
+              <option>恵比寿</option>
+              <option>銀座</option>
+              <option>新橋</option>
+              <option>横浜</option>
+              <option>その他東京都</option>
+              <option>その他関東</option>
+              <option>その他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="instagram">Instagram（任意）</label>
+            <input type="text" class="form-input" id="instagram" name="instagram" placeholder="@your_store">
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">担当者情報</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="contactName">担当者名<span class="required">*</span></label>
+            <input type="text" class="form-input" id="contactName" name="contactName" placeholder="山田 太郎" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">メールアドレス<span class="required">*</span></label>
+            <input type="email" class="form-input" id="email" name="email" placeholder="info@your-store.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">電話番号<span class="required">*</span></label>
+          <input type="tel" class="form-input" id="phone" name="phone" placeholder="03-0000-0000" required>
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:28px;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">ご希望内容</div>
+
+        <div class="form-group">
+          <label class="form-label" for="plan">ご検討中のプラン</label>
+          <select class="form-select" id="plan" name="plan">
+            <option value="">選択してください（未定でもOK）</option>
+            <option value="starter">スターター（¥9,800/月）</option>
+            <option value="standard">スタンダード（¥24,800/月）</option>
+            <option value="premium">プレミアム（¥49,800/月）</option>
+            <option value="custom">カスタム・ご相談</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="hiringNeeds">採用したいポジション・人数</label>
+          <input type="text" class="form-input" id="hiringNeeds" name="hiringNeeds" placeholder="ホールスタッフ2名・シーシャマスター1名など">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="message">ご質問・ご要望</label>
+          <textarea class="form-textarea" id="message" name="message" placeholder="お気軽に何でもお書きください。" rows="4"></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--full btn--lg" id="submitBtn">
+        送信する →
+      </button>
+      <p style="text-align:center;font-size:0.8rem;color:var(--gray);margin-top:12px;">
+        通常1〜2営業日以内にご連絡いたします。
+      </p>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer__bottom" style="border-top:1px solid var(--border);padding-top:24px;">
+      <span>© 2026 MOKUMOKU MATCH</span>
+      <a href="/listing" style="color:var(--gray);">掲載案内へ戻る</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
+function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
+
+// Pre-select plan from URL
+const urlPlan = new URLSearchParams(window.location.search).get('plan');
+if (urlPlan) document.getElementById('plan').value = urlPlan;
+
+document.getElementById('inquiryForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
+
+  // Validate
+  if (!data.storeName?.trim() || !data.contactName?.trim() || !data.email?.trim() || !data.phone?.trim()) {
+    showError('必須項目をすべて入力してください。');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+  hideError();
+
+  try {
+    const res = await fetch('/api/inquiry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (result.success) {
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'flex';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      showError(result.error || '送信に失敗しました。もう一度お試しください。');
+      btn.disabled = false;
+      btn.textContent = '送信する →';
+    }
+  } catch(err) {
+    showError('通信エラーが発生しました。もう一度お試しください。');
+    btn.disabled = false;
+    btn.textContent = '送信する →';
+  }
+});
+
+function showError(msg) {
+  const el = document.getElementById('errorAlert');
+  el.textContent = msg;
+  el.style.display = 'flex';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function hideError() {
+  document.getElementById('errorAlert').style.display = 'none';
+}
+</script>
+</body>
+</html>

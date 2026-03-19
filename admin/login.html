@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理者ログイン — MOKUMOKU MATCH</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      margin: 20px;
+    }
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-logo__mark {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--green), var(--green-l));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto 12px;
+    }
+    .login-logo__name {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .login-logo__sub {
+      font-size: 0.75rem;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo__mark">🌿</div>
+      <div class="login-logo__name">MOKUMOKU MATCH</div>
+      <div class="login-logo__sub">管理者ログイン</div>
+    </div>
+
+    <div id="errorAlert" class="alert alert--error" style="display:none;"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="email">メールアドレス</label>
+        <input type="email" class="form-input" id="email" name="email" placeholder="admin@mokumoku.match" value="admin@mokumoku.match" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">パスワード</label>
+        <input type="password" class="form-input" id="password" name="password" placeholder="プレビューPW: preview" required>
+        <div class="form-hint">プレビュー環境のPW: <strong style="color:var(--green-l);">preview</strong></div>
+      </div>
+      <button type="submit" class="btn btn--primary btn--full btn--lg" id="loginBtn" style="margin-top:8px;">
+        ログイン
+      </button>
+    </form>
+
+    <div style="text-align:center;margin-top:24px;">
+      <a href="/" style="font-size:0.8rem;color:var(--gray);">← サイトトップへ</a>
+    </div>
+  </div>
+
+  <script>
+    // Already logged in?
+    if (localStorage.getItem('admin_token')) {
+      window.location.href = '/admin';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.textContent = 'ログイン中...';
+      document.getElementById('errorAlert').style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth/admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem('admin_token', data.token);
+          localStorage.setItem('admin_email', data.email);
+          window.location.href = '/admin';
+        } else {
+          showError(data.error || 'ログインに失敗しました');
+          btn.disabled = false;
+          btn.textContent = 'ログイン';
+        }
+      } catch(err) {
+        showError('通信エラーが発生しました');
+        btn.disabled = false;
+        btn.textContent = 'ログイン';
+      }
+    });
+
+    function showError(msg) {
+      const el = document.getElementById('errorAlert');
+      el.textContent = msg;
+      el.style.display = 'flex';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>求人詳細 — MOKUMOKU MATCH</title>
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="/" class="nav__logo">
+      <div class="nav__logo-mark">🌿</div>
+      <span>MOKUMOKU MATCH</span>
+    </a>
+    <div class="nav__links">
+      <a href="/jobs">求人を探す</a>
+      <a href="/listing">店舗掲載</a>
+      <a href="/inquiry">お問い合わせ</a>
+    </div>
+    <div class="nav__cta">
+      <a href="/jobs" class="btn btn--primary">求人を見る</a>
+    </div>
+    <button class="nav__mobile-toggle" onclick="openMobileNav()" aria-label="メニュー">☰</button>
+  </nav>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav__header">
+    <div class="nav__logo"><div class="nav__logo-mark">🌿</div><span>MOKUMOKU MATCH</span></div>
+    <button class="mobile-nav__close" onclick="closeMobileNav()">✕</button>
+  </div>
+  <div class="mobile-nav__links">
+    <a href="/" onclick="closeMobileNav()">トップ</a>
+    <a href="/jobs" onclick="closeMobileNav()">求人を探す</a>
+    <a href="/listing" onclick="closeMobileNav()">店舗掲載</a>
+  </div>
+</div>
+
+<main id="main" style="padding: 32px 0 80px;">
+  <div class="container">
+    <!-- Loading state -->
+    <div id="loadingState">
+      <div class="skeleton" style="height:16px;width:200px;margin-bottom:24px;"></div>
+      <div class="skeleton" style="height:400px;border-radius:12px;margin-bottom:32px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:32px;">
+        <div>
+          <div class="skeleton" style="height:40px;width:80%;margin-bottom:16px;"></div>
+          <div class="skeleton" style="height:20px;width:40%;margin-bottom:32px;"></div>
+          <div class="skeleton" style="height:120px;border-radius:8px;"></div>
+        </div>
+        <div class="skeleton" style="height:360px;border-radius:12px;"></div>
+      </div>
+    </div>
+
+    <!-- Content (hidden until loaded) -->
+    <div id="jobContent" style="display:none;">
+      <nav class="breadcrumb">
+        <a href="/">トップ</a>
+        <span class="breadcrumb__sep">›</span>
+        <a href="/jobs">求人一覧</a>
+        <span class="breadcrumb__sep">›</span>
+        <span id="breadcrumbTitle">求人詳細</span>
+      </nav>
+
+      <!-- Hero image -->
+      <div id="heroImage" class="job-detail__hero-placeholder">🌿</div>
+
+      <!-- Layout -->
+      <div class="job-detail__layout">
+
+        <!-- Left: Main content -->
+        <div>
+          <div id="featuredBadge" style="display:none;">
+            <span class="tag tag--atmosphere" style="font-size:0.75rem;letter-spacing:0.06em;margin-bottom:12px;display:inline-flex;">⭐ FEATURED</span>
+          </div>
+          <h1 class="job-detail__title" id="jobTitle">—</h1>
+          <div class="job-detail__store-name" id="storeName">—</div>
+
+          <div class="tag-group" id="jobTags" style="margin-bottom:24px;"></div>
+
+          <!-- Job Description -->
+          <div class="job-detail__section">
+            <div class="job-detail__section-title">仕事内容</div>
+            <p id="jobDescription" style="line-height:1.9;color:var(--gray);font-size:0.9rem;"></p>
+          </div>
+
+          <!-- Requirements -->
+          <div class="job-detail__section">
+            <div class="job-detail__section-title">応募条件</div>
+            <p id="jobRequirements" style="line-height:1.9;color:var(--gray);font-size:0.9rem;"></p>
+          </div>
+
+          <!-- Benefits -->
+          <div class="job-detail__section">
+            <div class="job-detail__section-title">待遇・福利厚生</div>
+            <p id="jobBenefits" style="line-height:1.9;color:var(--gray);font-size:0.9rem;"></p>
+          </div>
+
+          <!-- Work Info -->
+          <div class="job-detail__section">
+            <div class="job-detail__section-title">勤務情報</div>
+            <div class="info-list" id="workInfo"></div>
+          </div>
+
+          <!-- Gallery -->
+          <div class="job-detail__section" id="gallerySection" style="display:none;">
+            <div class="job-detail__section-title">ギャラリー</div>
+            <div class="gallery" id="gallery"></div>
+          </div>
+
+          <!-- Shisha Info -->
+          <div class="job-detail__section" id="shishaSection">
+            <div class="job-detail__section-title">シーシャ情報</div>
+            <div class="shisha-grid" id="shishaGrid"></div>
+          </div>
+
+          <!-- Store Info -->
+          <div class="job-detail__section" id="storeSection">
+            <div class="job-detail__section-title">店舗情報</div>
+            <div class="info-list" id="storeInfo"></div>
+            <div class="tag-group" id="storeTags" style="margin-top:16px;"></div>
+          </div>
+
+        </div>
+
+        <!-- Right: Sticky apply card -->
+        <div>
+          <div class="sticky-apply-card">
+            <div class="sticky-apply-card__salary" id="cardSalary">—</div>
+            <div class="sticky-apply-card__type" id="cardType">—</div>
+
+            <div class="divider"></div>
+
+            <div class="info-list" style="margin-bottom:20px;" id="cardInfo"></div>
+
+            <a id="applyBtn" href="#" class="btn btn--primary btn--full btn--lg" style="margin-bottom:12px;">
+              この求人に応募する →
+            </a>
+            <a href="/jobs" class="btn btn--ghost btn--full btn--sm">求人一覧に戻る</a>
+
+            <div class="divider"></div>
+
+            <div style="font-size:0.8rem;color:var(--gray);line-height:1.7;">
+              📝 会員登録不要・完全無料<br>
+              フォームに入力するだけで応募できます。
+            </div>
+          </div>
+
+          <!-- Store SNS -->
+          <div id="storeSnsCard" class="sticky-apply-card" style="margin-top:16px;display:none;">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">SNS</div>
+            <div id="storeSnsLinks"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div id="errorState" style="display:none;text-align:center;padding:80px 20px;">
+      <div style="font-size:3rem;margin-bottom:16px;">🌿</div>
+      <h2 style="margin-bottom:12px;">求人が見つかりませんでした</h2>
+      <p style="color:var(--gray);margin-bottom:24px;">URLが間違っているか、掲載終了した可能性があります。</p>
+      <a href="/jobs" class="btn btn--primary">求人一覧へ戻る</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer__bottom" style="border-top:1px solid var(--border);padding-top:24px;">
+      <span>© 2026 MOKUMOKU MATCH</span>
+      <a href="/jobs" style="color:var(--gray);">求人一覧へ戻る</a>
+    </div>
+  </div>
+</footer>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="トップへ">↑</button>
+
+<script>
+function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
+function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 400);
+});
+
+const tagClasses = {
+  atmosphere: 'tag--atmosphere',
+  clientele: 'tag--clientele',
+  workStyle: 'tag--workStyle',
+  shishaElements: 'tag--shishaElements',
+};
+
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) return showError();
+
+  try {
+    const res = await fetch(`/api/jobs/${id}`);
+    if (!res.ok) return showError();
+    const job = await res.json();
+    renderJob(job);
+  } catch(e) {
+    showError();
+  }
+}
+
+function showError() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('errorState').style.display = 'block';
+}
+
+function renderJob(job) {
+  document.title = `${job.title} — MOKUMOKU MATCH`;
+  document.getElementById('breadcrumbTitle').textContent = job.title;
+
+  // Hero image
+  const heroEl = document.getElementById('heroImage');
+  if (job.store?.mainPhoto) {
+    heroEl.outerHTML = `<img class="job-detail__hero" src="${job.store.mainPhoto}" alt="${job.store.name}" loading="lazy">`;
+  }
+
+  // Featured badge
+  if (job.isFeatured) document.getElementById('featuredBadge').style.display = 'block';
+
+  document.getElementById('jobTitle').textContent = job.title;
+  document.getElementById('storeName').textContent = `${job.store?.name || ''} · ${job.area || ''}`;
+  document.getElementById('jobDescription').textContent = job.description;
+  document.getElementById('jobRequirements').textContent = job.requirements;
+  document.getElementById('jobBenefits').textContent = job.benefits;
+
+  // Tags
+  const tagsEl = document.getElementById('jobTags');
+  Object.entries(job.tags || {}).forEach(([cat, arr]) => {
+    (arr || []).forEach(name => {
+      const span = document.createElement('span');
+      span.className = `tag ${tagClasses[cat] || ''}`;
+      span.textContent = name;
+      tagsEl.appendChild(span);
+    });
+  });
+
+  // Work info
+  document.getElementById('workInfo').innerHTML = `
+    <div class="info-item"><div class="info-item__label">給与</div><div class="info-item__value" style="color:var(--green-l);font-weight:700;">${job.salary}</div></div>
+    <div class="info-item"><div class="info-item__label">雇用形態</div><div class="info-item__value">${job.employmentType}</div></div>
+    <div class="info-item"><div class="info-item__label">勤務時間</div><div class="info-item__value">${job.hours}</div></div>
+    <div class="info-item"><div class="info-item__label">勤務日数</div><div class="info-item__value">${job.workDays}</div></div>
+    <div class="info-item"><div class="info-item__label">エリア</div><div class="info-item__value">${job.area} (${job.prefecture})</div></div>
+  `;
+
+  // Card
+  document.getElementById('cardSalary').textContent = job.salary;
+  document.getElementById('cardType').textContent = job.employmentType;
+  document.getElementById('cardInfo').innerHTML = `
+    <div class="info-item"><div class="info-item__label">勤務時間</div><div class="info-item__value">${job.hours}</div></div>
+    <div class="info-item"><div class="info-item__label">シフト</div><div class="info-item__value">${job.workDays}</div></div>
+    <div class="info-item"><div class="info-item__label">エリア</div><div class="info-item__value">${job.area}</div></div>
+  `;
+  document.getElementById('applyBtn').href = `/apply?id=${job.id}`;
+
+  // Shisha info
+  const store = job.store;
+  if (store?.shishaInfo) {
+    const si = store.shishaInfo;
+    document.getElementById('shishaGrid').innerHTML = `
+      <div class="shisha-item">
+        <div class="shisha-item__value">${si.flavorCount}+</div>
+        <div class="shisha-item__label">フレーバー数</div>
+      </div>
+      <div class="shisha-item">
+        <div class="shisha-item__value">${si.mixFreedom}</div>
+        <div class="shisha-item__label">ミックス</div>
+      </div>
+      <div class="shisha-item">
+        <div class="shisha-item__value">${si.nonNicotine ? '✓' : '—'}</div>
+        <div class="shisha-item__label">ノンニコチン</div>
+      </div>
+      <div class="shisha-item">
+        <div class="shisha-item__value">${si.training ? '✓' : '—'}</div>
+        <div class="shisha-item__label">研修制度</div>
+      </div>
+      <div class="shisha-item">
+        <div class="shisha-item__value" style="font-size:0.85rem;">${si.equipment || '—'}</div>
+        <div class="shisha-item__label">機材</div>
+      </div>
+    `;
+  }
+
+  // Gallery (mainPhoto + sub photos)
+  const allPhotos = [
+    ...(store?.mainPhoto ? [store.mainPhoto] : []),
+    ...(store?.photos || []),
+  ];
+  if (allPhotos.length > 0) {
+    const gallerySection = document.getElementById('gallerySection');
+    gallerySection.style.display = 'block';
+    const gallery = document.getElementById('gallery');
+    // main photo spans 2 rows, rest fill the grid
+    gallery.innerHTML = allPhotos.map((url, i) => `
+      <div class="${i === 0 ? 'gallery__main' : ''}">
+        <img src="${url}" alt="店舗写真${i + 1}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+      </div>`).join('');
+  }
+
+  // Store info
+  if (store) {
+    document.getElementById('storeInfo').innerHTML = `
+      <div class="info-item"><div class="info-item__label">店舗名</div><div class="info-item__value">${store.name}</div></div>
+      <div class="info-item"><div class="info-item__label">最寄駅</div><div class="info-item__value">${store.station || '—'}</div></div>
+      <div class="info-item"><div class="info-item__label">住所</div><div class="info-item__value">${store.address || '—'}</div></div>
+    `;
+
+    // Store tags
+    const storeTags = document.getElementById('storeTags');
+    (store.atmosphere || []).forEach(a => {
+      const span = document.createElement('span');
+      span.className = 'tag tag--atmosphere';
+      span.textContent = a;
+      storeTags.appendChild(span);
+    });
+    (store.clientele || []).forEach(a => {
+      const span = document.createElement('span');
+      span.className = 'tag tag--clientele';
+      span.textContent = a;
+      storeTags.appendChild(span);
+    });
+
+    // SNS
+    const sns = store.sns || {};
+    if (sns.instagram || sns.tiktok || sns.website) {
+      document.getElementById('storeSnsCard').style.display = 'block';
+      const snsLinks = document.getElementById('storeSnsLinks');
+      if (sns.instagram) {
+        snsLinks.innerHTML += `<a href="https://instagram.com/${sns.instagram.replace('@','')}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:0.875rem;color:var(--white);text-decoration:none;">
+          <span style="font-size:1.1rem;">📷</span>
+          <span>Instagram</span>
+          <span style="color:var(--green-l);margin-left:auto;">${sns.instagram}</span>
+        </a>`;
+      }
+      if (sns.tiktok) {
+        snsLinks.innerHTML += `<a href="https://tiktok.com/@${sns.tiktok.replace('@','')}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:0.875rem;color:var(--white);text-decoration:none;">
+          <span style="font-size:1.1rem;">🎵</span>
+          <span>TikTok</span>
+          <span style="color:var(--green-l);margin-left:auto;">${sns.tiktok}</span>
+        </a>`;
+      }
+      if (sns.website) {
+        snsLinks.innerHTML += `<a href="${sns.website}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:10px 0;font-size:0.875rem;color:var(--white);text-decoration:none;">
+          <span style="font-size:1.1rem;">🌐</span>
+          <span>ウェブサイト</span>
+          <span style="color:var(--green-l);margin-left:auto;">→ 開く</span>
+        </a>`;
+      }
+    }
+  }
+
+  // Show content
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('jobContent').style.display = 'block';
+}
+
+init();
+</script>
+</body>
+</html>
