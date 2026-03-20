@@ -34,7 +34,7 @@ try {
 // ============================================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname), { extensions: ['html'] }));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Multer
