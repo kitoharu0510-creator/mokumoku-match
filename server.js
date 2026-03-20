@@ -20,8 +20,14 @@ const JWT_SECRET = process.env.JWT_SECRET || 'change-this-in-production';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // UPLOAD_DIR: Render Disk は /var/data/uploads、ローカルは ./uploads
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+let UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
+try {
+  if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+} catch (err) {
+  console.warn('⚠️ UPLOAD_DIR 作成失敗、./uploads にフォールバック:', err.message);
+  UPLOAD_DIR = path.join(__dirname, 'uploads');
+  if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 // ============================================
 // Middleware
