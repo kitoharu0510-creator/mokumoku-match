@@ -697,7 +697,7 @@ async function editStore(id) {
 }
 
 async function saveStore() {
-  const id = document.getElementById('sfId').value;
+  const id = document.getElementById('sfId').value?.replace(/^ObjectId\("(.+)"\)$/, '$1');
   const data = {
     name: document.getElementById('sfName').value,
     area: document.getElementById('sfArea').value,
@@ -1004,10 +1004,17 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 });
 
 // API helpers
+function normalizeId(item) {
+  if (!item || typeof item !== 'object') return item;
+  const id = item._id || item.id;
+  return { ...item, id: String(id) };
+}
 async function apiGet(url) {
   const res = await fetch(url, { headers: headers() });
   if (res.status === 401) { logout(); return []; }
-  return res.json();
+  const data = await res.json();
+  if (Array.isArray(data)) return data.map(normalizeId);
+  return normalizeId(data);
 }
 async function apiPost(url, data) {
   return fetch(url, { method: 'POST', headers: headers(), body: JSON.stringify(data) }).then(r => r.json());
