@@ -296,6 +296,13 @@ app.post('/api/auth/admin', async (req, res) => {
 // Admin API (Protected)
 // ============================================
 
+// Image upload
+app.post('/api/admin/upload', authMiddleware, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'ファイルがありません' });
+  const url = `/uploads/${req.file.filename}`;
+  res.json({ url });
+});
+
 // Stores
 app.get('/api/admin/stores', authMiddleware, async (req, res) => res.json(await Store.find()));
 app.post('/api/admin/stores', authMiddleware, async (req, res) => res.status(201).json(await Store.create(req.body)));
