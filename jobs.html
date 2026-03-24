@@ -339,7 +339,7 @@ function renderJobs(jobs) {
 
   jobs.forEach(job => {
     const card = document.createElement('a');
-    card.href = `/job?id=${job.id}`;
+    card.href = `/job?id=${job._id || job.id}`;
     card.className = `job-card${job.isFeatured ? ' job-card--featured' : ''}`;
 
     const jobTags = [

@@ -259,7 +259,7 @@ function renderJob(job) {
     <div class="info-item"><div class="info-item__label">シフト</div><div class="info-item__value">${job.workDays}</div></div>
     <div class="info-item"><div class="info-item__label">エリア</div><div class="info-item__value">${job.area}</div></div>
   `;
-  document.getElementById('applyBtn').href = `/apply?id=${job.id}`;
+  document.getElementById('applyBtn').href = `/apply?id=${job._id || job.id}`;
 
   // Shisha info
   const store = job.store;
