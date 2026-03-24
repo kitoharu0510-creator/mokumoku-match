@@ -609,7 +609,10 @@ function openJobModal(job = null) {
   sel.innerHTML = storesList.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 
   if (job) {
-    document.getElementById('jfStoreId').value = job.storeId || '';
+    const storeIdVal = typeof job.storeId === 'object'
+      ? String(job.storeId?._id || job.storeId?.id || '')
+      : String(job.storeId || '');
+    document.getElementById('jfStoreId').value = storeIdVal;
     document.getElementById('jfTitle').value = job.title || '';
     document.getElementById('jfEmploymentType').value = job.employmentType || 'アルバイト';
     document.getElementById('jfArea').value = job.area || '渋谷';
@@ -637,9 +640,11 @@ function openJobModal(job = null) {
 }
 
 async function editJob(id) {
+  if (!id || id === 'undefined') return;
   const jobs = await apiGet('/api/admin/jobs');
-  const job = jobs.find(j => j.id === id);
+  const job = jobs.find(j => j.id === id || j._id === id);
   if (job) openJobModal(job);
+  else alert('求人データの取得に失敗しました');
 }
 
 async function saveJob() {
@@ -766,9 +771,11 @@ async function openStoreModal(store = null) {
 }
 
 async function editStore(id) {
+  if (!id || id === 'undefined') return;
   const stores = await apiGet('/api/admin/stores');
-  const store = stores.find(s => s.id === id);
+  const store = stores.find(s => s.id === id || s._id === id);
   if (store) openStoreModal(store);
+  else alert('店舗データの取得に失敗しました');
 }
 
 async function saveStore() {
@@ -1101,8 +1108,14 @@ async function apiPut(url, data) {
 // ============================================
 // Init
 // ============================================
-loadDashboard();
-storesList = apiGet('/api/admin/stores').then(s => { storesList = s; });
+async function init() {
+  loadDashboard();
+  [storesList, tagsList] = await Promise.all([
+    apiGet('/api/admin/stores'),
+    apiGet('/api/admin/tags'),
+  ]);
+}
+init();
 </script>
 </body>
 </html>
