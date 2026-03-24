@@ -289,18 +289,14 @@ function renderJob(job) {
     `;
   }
 
-  // Gallery (mainPhoto + sub photos)
-  const allPhotos = [
-    ...(store?.mainPhoto ? [store.mainPhoto] : []),
-    ...(store?.photos || []),
-  ];
-  if (allPhotos.length > 0) {
+  // Gallery (サブ画像のみ)
+  const subPhotos = store?.photos || [];
+  if (subPhotos.length > 0) {
     const gallerySection = document.getElementById('gallerySection');
     gallerySection.style.display = 'block';
     const gallery = document.getElementById('gallery');
-    // main photo spans 2 rows, rest fill the grid
-    gallery.innerHTML = allPhotos.map((url, i) => `
-      <div class="${i === 0 ? 'gallery__main' : ''}">
+    gallery.innerHTML = subPhotos.map((url, i) => `
+      <div>
         <img src="${url}" alt="店舗写真${i + 1}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
       </div>`).join('');
   }
