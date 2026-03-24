@@ -301,7 +301,28 @@
           <label class="form-label">待遇</label>
           <textarea class="form-textarea" id="jfBenefits" rows="2"></textarea>
         </div>
-        <div class="form-group">
+        <!-- タグ選択 -->
+        <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:4px;">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">カルチャータグ</div>
+          <div class="form-group">
+            <label class="form-label">雰囲気</label>
+            <div id="jfAtmosphereTags" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">客層</label>
+            <div id="jfClienteleTags" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">働き方</label>
+            <div id="jfWorkStyleTags" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">シーシャ要素</label>
+            <div id="jfShishaElementsTags" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:16px;">
           <label class="form-label">
             <input type="checkbox" id="jfFeatured" style="accent-color:var(--green);margin-right:6px;">
             FEATUREDに設定
@@ -372,6 +393,19 @@
           <div class="form-group">
             <label class="form-label">機材</label>
             <input type="text" class="form-input" id="sfEquipment" placeholder="KM使用">
+          </div>
+        </div>
+
+        <!-- 雰囲気・客層タグ -->
+        <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:4px;">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">カルチャータグ</div>
+          <div class="form-group">
+            <label class="form-label">雰囲気</label>
+            <div id="sfAtmosphereTags" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">客層</label>
+            <div id="sfClienteleTags" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
           </div>
         </div>
 
@@ -588,8 +622,16 @@ function openJobModal(job = null) {
     document.getElementById('jfRequirements').value = job.requirements || '';
     document.getElementById('jfBenefits').value = job.benefits || '';
     document.getElementById('jfFeatured').checked = job.isFeatured || false;
+    renderTagCheckboxes('jfAtmosphereTags',    'atmosphere',     job.tags?.atmosphere     || []);
+    renderTagCheckboxes('jfClienteleTags',     'clientele',      job.tags?.clientele      || []);
+    renderTagCheckboxes('jfWorkStyleTags',     'workStyle',      job.tags?.workStyle      || []);
+    renderTagCheckboxes('jfShishaElementsTags','shishaElements', job.tags?.shishaElements || []);
   } else {
     document.getElementById('jobForm').reset();
+    renderTagCheckboxes('jfAtmosphereTags',    'atmosphere',     []);
+    renderTagCheckboxes('jfClienteleTags',     'clientele',      []);
+    renderTagCheckboxes('jfWorkStyleTags',     'workStyle',      []);
+    renderTagCheckboxes('jfShishaElementsTags','shishaElements', []);
   }
   openModal('jobModal');
 }
@@ -618,7 +660,12 @@ async function saveJob() {
     requirements: document.getElementById('jfRequirements').value,
     benefits: document.getElementById('jfBenefits').value,
     isFeatured: document.getElementById('jfFeatured').checked,
-    tags: { atmosphere: [], clientele: [], workStyle: [], shishaElements: [] },
+    tags: {
+      atmosphere:     getCheckedTags('jfAtmosphereTags'),
+      clientele:      getCheckedTags('jfClienteleTags'),
+      workStyle:      getCheckedTags('jfWorkStyleTags'),
+      shishaElements: getCheckedTags('jfShishaElementsTags'),
+    },
   };
   if (!data.title) return alert('タイトルを入力してください');
 
@@ -658,6 +705,29 @@ async function loadStores() {
     </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px;">店舗がありません</td></tr>';
 }
 
+// タグチェックボックスのrender helper
+function renderTagCheckboxes(containerId, category, selectedNames = []) {
+  const container = document.getElementById(containerId);
+  const tags = tagsList.filter(t => t.category === category);
+  const clsMap = { atmosphere:'tag--atmosphere', clientele:'tag--clientele', workStyle:'tag--workStyle', shishaElements:'tag--shishaElements' };
+  container.innerHTML = tags.map(t => {
+    const checked = selectedNames.includes(t.name);
+    return `<label style="cursor:pointer;">
+      <input type="checkbox" value="${t.name}" data-container="${containerId}"
+        style="display:none;" ${checked ? 'checked' : ''}
+        onchange="this.parentElement.classList.toggle('tag--selected',this.checked)">
+      <span class="tag ${clsMap[category]||''}" style="opacity:${checked?1:0.4};transition:opacity .15s;"
+        onclick="var cb=this.previousElementSibling;cb.checked=!cb.checked;this.style.opacity=cb.checked?1:0.4;">
+        ${t.name}
+      </span>
+    </label>`;
+  }).join('');
+}
+
+function getCheckedTags(containerId) {
+  return [...document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`)].map(cb => cb.value);
+}
+
 // 現在編集中のサブ画像URLリスト
 let sfSubPhotos = [];
 
@@ -681,11 +751,16 @@ async function openStoreModal(store = null) {
     setMainPhotoPreview(store.mainPhoto || '');
     sfSubPhotos = store.photos ? [...store.photos] : [];
     renderSubPhotos();
+    // タグ
+    renderTagCheckboxes('sfAtmosphereTags', 'atmosphere', store.atmosphere || []);
+    renderTagCheckboxes('sfClienteleTags',  'clientele',  store.clientele  || []);
   } else {
     document.getElementById('storeForm').reset();
     document.getElementById('sfId').value = '';
     setMainPhotoPreview('');
     renderSubPhotos();
+    renderTagCheckboxes('sfAtmosphereTags', 'atmosphere', []);
+    renderTagCheckboxes('sfClienteleTags',  'clientele',  []);
   }
   openModal('storeModal');
 }
@@ -715,8 +790,8 @@ async function saveStore() {
     },
     mainPhoto: document.getElementById('sfMainPhoto').value || '',
     photos: [...sfSubPhotos],
-    atmosphere: [],
-    clientele: [],
+    atmosphere: getCheckedTags('sfAtmosphereTags'),
+    clientele:  getCheckedTags('sfClienteleTags'),
     prefecture: '東京都',
   };
   if (!data.name) return alert('店舗名を入力してください');
