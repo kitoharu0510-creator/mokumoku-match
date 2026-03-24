@@ -119,8 +119,8 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="motivation">志望動機・自己PR<span class="required">*</span></label>
-          <textarea class="form-textarea" id="motivation" name="motivation" placeholder="このお店を選んだ理由、自己PRなどをご記入ください。" rows="5" required style="min-height:140px;"></textarea>
+          <label class="form-label" for="motivation">志望動機・自己PR<span style="color:var(--gray);font-size:0.8rem;margin-left:6px;">任意</span></label>
+          <textarea class="form-textarea" id="motivation" name="motivation" placeholder="このお店を選んだ理由、自己PRなどをご記入ください。" rows="5" style="min-height:140px;"></textarea>
           <div class="form-hint">シーシャが好きな理由、どんなスタッフになりたいかなど自由にお書きください。</div>
         </div>
       </div>
@@ -249,7 +249,7 @@ document.getElementById('applyForm').addEventListener('submit', async (e) => {
   const formData = new FormData(e.target);
 
   // Validate required
-  const required = ['name', 'nameKana', 'email', 'phone', 'motivation'];
+  const required = ['name', 'nameKana', 'email', 'phone'];
   for (const key of required) {
     if (!formData.get(key)?.trim()) {
       showError('必須項目をすべて入力してください。');
