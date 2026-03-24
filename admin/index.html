@@ -710,27 +710,26 @@ async function loadStores() {
     </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px;">店舗がありません</td></tr>';
 }
 
-// タグチェックボックスのrender helper
+// タグ選択のrender helper
 function renderTagCheckboxes(containerId, category, selectedNames = []) {
   const container = document.getElementById(containerId);
+  if (!container) return;
   const tags = tagsList.filter(t => t.category === category);
   const clsMap = { atmosphere:'tag--atmosphere', clientele:'tag--clientele', workStyle:'tag--workStyle', shishaElements:'tag--shishaElements' };
   container.innerHTML = tags.map(t => {
-    const checked = selectedNames.includes(t.name);
-    return `<label style="cursor:pointer;">
-      <input type="checkbox" value="${t.name}" data-container="${containerId}"
-        style="display:none;" ${checked ? 'checked' : ''}
-        onchange="this.parentElement.classList.toggle('tag--selected',this.checked)">
-      <span class="tag ${clsMap[category]||''}" style="opacity:${checked?1:0.4};transition:opacity .15s;"
-        onclick="var cb=this.previousElementSibling;cb.checked=!cb.checked;this.style.opacity=cb.checked?1:0.4;">
-        ${t.name}
-      </span>
-    </label>`;
+    const on = selectedNames.includes(t.name);
+    return `<span class="tag ${clsMap[category]||''}"
+      style="cursor:pointer;opacity:${on?1:0.35};transition:opacity .15s;user-select:none;"
+      data-selected="${on}"
+      data-name="${t.name}"
+      onclick="var s=this.dataset.selected==='true';this.dataset.selected=!s;this.style.opacity=(!s)?1:0.35;">
+      ${t.name}
+    </span>`;
   }).join('');
 }
 
 function getCheckedTags(containerId) {
-  return [...document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`)].map(cb => cb.value);
+  return [...document.querySelectorAll(`#${containerId} span[data-selected="true"]`)].map(s => s.dataset.name);
 }
 
 // 現在編集中のサブ画像URLリスト
