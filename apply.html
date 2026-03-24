@@ -265,7 +265,15 @@ document.getElementById('applyForm').addEventListener('submit', async (e) => {
 
   try {
     const res = await fetch('/api/apply', { method: 'POST', body: formData });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      showError(`サーバーエラーが発生しました（HTTP ${res.status}）。時間をおいて再度お試しください。`);
+      btn.disabled = false;
+      btn.textContent = '応募する →';
+      return;
+    }
     if (data.success) {
       window.location.href = '/thanks';
     } else {
@@ -274,7 +282,7 @@ document.getElementById('applyForm').addEventListener('submit', async (e) => {
       btn.textContent = '応募する →';
     }
   } catch(err) {
-    showError('通信エラーが発生しました。もう一度お試しください。');
+    showError('通信エラーが発生しました。ネットワーク接続を確認してください。');
     btn.disabled = false;
     btn.textContent = '応募する →';
   }

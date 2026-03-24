@@ -220,7 +220,12 @@ app.get('/api/stores', async (req, res) => {
   res.json(await Store.find({ isActive: true }));
 });
 
-app.post('/api/apply', upload.single('resume'), async (req, res) => {
+app.post('/api/apply', (req, res, next) => {
+  upload.single('resume')(req, res, err => {
+    if (err) return res.status(400).json({ error: 'ファイルエラー: ' + err.message });
+    next();
+  });
+}, async (req, res) => {
   try {
     const { jobId, name, nameKana, email, phone, age, experience, motivation, availableDays } = req.body;
     if (!jobId || !name || !email || !phone) return res.status(400).json({ error: '必須項目を入力してください' });
@@ -253,6 +258,7 @@ app.post('/api/apply', upload.single('resume'), async (req, res) => {
 
     res.json({ success: true, applicationId: application._id });
   } catch(e) {
+    console.error('Apply error:', e);
     res.status(500).json({ error: e.message });
   }
 });
