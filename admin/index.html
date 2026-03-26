@@ -914,6 +914,16 @@ async function openAppDetail(id) {
   const app = allApps.find(a => a.id === id);
   if (!app) return;
   currentAppId = id;
+  // 新着なら開いた時点で選考中に自動更新
+  if (app.status === 'new') {
+    app.status = 'reviewing';
+    await apiPut(`/api/admin/applications/${id}`, { status: 'reviewing' });
+    // バッジを即時更新
+    const badge = document.getElementById('newAppsCount');
+    const current = parseInt(badge.textContent || '0') - 1;
+    if (current <= 0) badge.style.display = 'none';
+    else badge.textContent = current;
+  }
   document.getElementById('appStatusSelect').value = app.status;
   document.getElementById('appModalBody').innerHTML = `
     <div class="info-list" style="margin-bottom:16px;">
