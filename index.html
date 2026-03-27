@@ -419,7 +419,7 @@ function renderFeaturedJobs(jobs) {
 
 function createJobCard(job) {
   const div = document.createElement('a');
-  div.href = `/job?id=${job.id}`;
+  div.href = `/job?id=${job._id || job.id}`;
   div.className = `job-card${job.isFeatured ? ' job-card--featured' : ''}`;
 
   const allJobTags = [
